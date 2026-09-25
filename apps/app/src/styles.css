@@ -1,0 +1,42 @@
+/* Must precede @import "tailwindcss" — Tailwind v4 expands that directive
+   into real CSS at this point; any @import placed after it is no longer at
+   the top of the stylesheet, which is invalid CSS and gets silently
+   dropped (no network request even fires), not a build error. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* GOTCHA: Tailwind v4's automatic content scanner only walks this app's own
+   src/ tree — it never looks inside the sibling @knh/ui workspace package.
+   Any utility class used only inside a shared component in
+   packages/ui/src (e.g. icon-button.tsx) would never be generated here
+   without this @source directive making the scanner also walk that
+   package. */
+@source "../../../packages/ui/src";
+@import "@knh/ui/tokens.css";
+@import "tw-animate-css";
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+/* Reusable glassmorphism surface for cards across the public site and both
+   dashboards — centralized here so every "glass card" stays visually
+   consistent instead of each component hand-rolling backdrop-filter values. */
+.glass-panel {
+  background: color-mix(in srgb, white 62%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, white 40%, transparent);
+  box-shadow:
+    0 8px 32px color-mix(in srgb, #0d0d0d 8%, transparent),
+    inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
+}
+
+.glass-panel-dark {
+  background: color-mix(in srgb, #0d0d0d 72%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid color-mix(in srgb, white 12%, transparent);
+}
