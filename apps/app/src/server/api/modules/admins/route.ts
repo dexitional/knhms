@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
 import { ANY_ADMIN, SUPER_ADMIN_ONLY, requireAdminRole } from "../../middleware/require-auth.js";
-import { createAdminSchema, updateAdminSchema } from "./schema.js";
+import { createAdminSchema, updateAdminSchema, resetAdminPasswordSchema } from "./schema.js";
 import * as service from "./service.js";
 
 export const adminsRoute = new Hono()
@@ -24,6 +24,10 @@ export const adminsRoute = new Hono()
   .patch("/:id", zValidator("json", updateAdminSchema), async (c) => {
     const admin = await service.updateAdmin(Number(c.req.param("id")), c.req.valid("json"));
     return c.json({ admin });
+  })
+  .post("/:id/reset-password", zValidator("json", resetAdminPasswordSchema), async (c) => {
+    const result = await service.resetAdminPassword(Number(c.req.param("id")));
+    return c.json(result);
   })
   .delete("/:id", async (c) => {
     await service.deactivateAdmin(Number(c.req.param("id")));

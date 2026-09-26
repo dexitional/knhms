@@ -6,12 +6,12 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/60 glass-panel">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-3">
-          <img src={asset("logo.png")} alt="Kwame Nkrumah Hall crest" className="h-10 w-auto" />
-          <div className="leading-tight">
-            <p className="text-sm font-bold tracking-wide text-foreground sm:text-base">
+          <img src={asset("logo.png")} alt="Kwame Nkrumah Hall crest" className="h-11 w-auto" />
+          <div className="leading-none">
+            <p className="text-base font-extrabold tracking-wide text-foreground sm:text-lg">
               KWAME NKRUMAH HALL
             </p>
-            <p className="text-[11px] font-medium tracking-widest text-primary uppercase">
+            <p className="-mt-2 text-lg font-bold tracking-wide text-primary sm:text-xl" style={{ fontFamily: "'Caveat', cursive" }}>
               Leadership by Example
             </p>
           </div>

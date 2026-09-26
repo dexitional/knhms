@@ -4,6 +4,7 @@ import type { ResultSetHeader, RowDataPacket } from "mysql2";
 import type { z } from "zod";
 import { AppError } from "../../middleware/error-handler.js";
 import type { createAdminSchema, updateAdminSchema } from "./schema.js";
+import { sendSms, toE164 } from "../../lib/sms.js";
 
 // Never selects password_hash.
 const SELECT_COLUMNS = `
@@ -16,6 +17,15 @@ type UpdateInput = z.infer<typeof updateAdminSchema>;
 
 interface MysqlError extends Error {
   code?: string;
+}
+
+function generatePassword(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+  let password = "";
+  for (let i = 0; i < 10; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
 }
 
 export async function listAdmins() {
@@ -91,6 +101,28 @@ export async function updateAdmin(id: number, input: UpdateInput) {
   ]);
   if (result.affectedRows === 0) throw new AppError("Admin not found.", 404);
   return getAdmin(id);
+}
+
+export async function resetAdminPassword(id: number) {
+  const pool = getPool();
+  const admin = await getAdmin(id);
+
+  if (!admin.phone_number) {
+    throw new AppError("Admin has no phone number on file.", 400);
+  }
+
+  const newPassword = generatePassword();
+  const passwordHash = await bcrypt.hash(newPassword, 12);
+
+  await pool.execute<ResultSetHeader>(
+    "UPDATE admins SET password_hash = ? WHERE id = ?",
+    [passwordHash, id],
+  );
+
+  const phone = toE164("+233", admin.phone_number);
+  await sendSms(phone, `Your KNH Admin password has been reset. New password: ${newPassword}. Please log in and change it immediately.`);
+
+  return { success: true, phone: phone.slice(0, -4) + "****" };
 }
 
 // Never a hard delete — repair_requests.assigned_admin_id history must

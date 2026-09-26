@@ -21,3 +21,7 @@ export const updateAdminSchema = z.object({
   photoUrl: z.string().url().nullable().optional(),
   isActive: z.boolean().optional(),
 });
+
+export const resetAdminPasswordSchema = z.object({
+  id: z.number().int(),
+});

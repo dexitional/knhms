@@ -59,7 +59,7 @@ function StudentLoginPage() {
           <img
             src={asset('logo.png')}
             alt="Kwame Nkrumah Hall crest"
-            className="h-9 w-auto"
+            className="mx-auto h-20 max-w-[140px] object-contain"
           />
           <h1 className="mt-5 text-2xl font-semibold text-foreground">
             Sign in

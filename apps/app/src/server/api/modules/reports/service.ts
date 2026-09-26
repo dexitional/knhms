@@ -1,22 +1,49 @@
 import { getPool } from "@knh/db";
 import type { RowDataPacket } from "mysql2";
+import type { z } from "zod";
+import { listStudentsReportQuerySchema, listRepairsReportQuerySchema } from "./schema.js";
 
-export async function getStudentsReport() {
+type ListStudentsReportQuery = z.infer<typeof listStudentsReportQuerySchema>;
+type ListRepairsReportQuery = z.infer<typeof listRepairsReportQuerySchema>;
+
+export async function getStudentsReport(query: ListStudentsReportQuery) {
   const pool = getPool();
+  const offset = (query.page - 1) * query.pageSize;
+
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT s.id, s.full_name, s.registration_number, s.level, s.gender,
             r.room_number, s.created_at AS registered_at
      FROM students s JOIN rooms r ON r.id = s.room_id
-     ORDER BY s.created_at DESC`,
+     ORDER BY s.created_at DESC
+     LIMIT ? OFFSET ?`,
+    [query.pageSize, offset],
   );
-  return rows;
+
+  const [countRows] = await pool.query<RowDataPacket[]>(
+    "SELECT COUNT(*) AS total FROM students",
+  );
+
+  return { students: rows, total: Number(countRows[0]?.total ?? 0), page: query.page, pageSize: query.pageSize };
 }
 
-export async function getRepairsReport() {
+export async function getRepairsReport(query: ListRepairsReportQuery) {
   const pool = getPool();
+  const offset = (query.page - 1) * query.pageSize;
+
+  const conditions: string[] = [];
+  const params: any[] = [];
+
+  if (query.status) {
+    conditions.push("rr.status = ?");
+    params.push(query.status);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+
   const [statusCounts] = await pool.query<RowDataPacket[]>(
     `SELECT status, COUNT(*) AS count FROM repair_requests GROUP BY status`,
   );
+
   const [rows] = await pool.query<RowDataPacket[]>(
     `SELECT rr.*, r.room_number, s.full_name AS student_name, s.registration_number,
             a.full_name AS assigned_admin_name
@@ -24,9 +51,22 @@ export async function getRepairsReport() {
      JOIN rooms r ON r.id = rr.room_id
      JOIN students s ON s.id = rr.student_id
      LEFT JOIN admins a ON a.id = rr.assigned_admin_id
-     ORDER BY rr.created_at DESC`,
+     ${where} ORDER BY rr.created_at DESC LIMIT ? OFFSET ?`,
+    [...params, query.pageSize, offset],
   );
-  return { statusCounts, items: rows };
+
+  const [countRows] = await pool.query<RowDataPacket[]>(
+    `SELECT COUNT(*) AS total FROM repair_requests rr ${where}`,
+    params,
+  );
+
+  return {
+    statusCounts,
+    items: rows,
+    total: Number(countRows[0]?.total ?? 0),
+    page: query.page,
+    pageSize: query.pageSize,
+  };
 }
 
 export async function getOverview() {

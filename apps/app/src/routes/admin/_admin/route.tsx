@@ -48,10 +48,10 @@ function AdminLayout() {
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-foreground text-background sm:flex">
         <div className="flex items-center gap-3 border-b border-white/10 px-6 py-5">
-          <img src={asset("logo.png")} alt="" className="h-9 w-auto" />
+          <img src={asset("logo.png")} alt="" className="h-12 w-auto" />
           <div className="leading-tight">
-            <p className="text-sm font-bold">KNH</p>
-            <p className="text-[10px] tracking-widest text-primary uppercase">Admin Portal</p>
+            <p className="text-lg font-bold tracking-widest">KNH</p>
+            <p className="text-xs tracking-widest text-primary uppercase">Admin</p>
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
@@ -79,7 +79,12 @@ function AdminLayout() {
             <KeyRound className="size-4" />
             Account
           </Link>
-          <Button variant="outline" size="sm" className="w-full border-white/20 text-background hover:bg-white/10 hover:text-background" onClick={handleLogout}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full border-white/20 bg-transparent text-background hover:bg-slate-200 hover:text-foreground"
+            onClick={handleLogout}
+          >
             <LogOut className="size-4" />
             Log out
           </Button>

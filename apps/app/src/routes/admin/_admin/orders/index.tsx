@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
-import { api } from "#/lib/api-client";
+import { useState } from "react"
+import { createFileRoute } from "@tanstack/react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
+import { toast } from "sonner"
+import { Search } from "lucide-react"
+import { api } from "#/lib/api-client"
+import { Input } from "#/components/ui/input.tsx"
 import {
   Table,
   TableBody,
@@ -10,72 +12,98 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "#/components/ui/table.tsx";
+} from "#/components/ui/table.tsx"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "#/components/ui/select.tsx";
+} from "#/components/ui/select.tsx"
+import { Pagination } from "#/components/pagination"
 
 export const Route = createFileRoute("/admin/_admin/orders/")({
   component: AdminOrdersPage,
-});
+})
 
 interface OrderRow {
-  id: number;
-  student_name: string;
-  registration_number: string;
-  service_type: string;
-  quantity: number;
-  details: string | null;
-  status: string;
-  created_at: string;
+  id: number
+  student_name: string
+  registration_number: string
+  service_type: string
+  quantity: number
+  details: string | null
+  status: string
+  created_at: string
 }
 
-const STATUSES = ["all", "pending", "processing", "completed", "cancelled"] as const;
-const EDITABLE_STATUSES = ["pending", "processing", "completed", "cancelled"] as const;
+const STATUSES = ["all", "pending", "processing", "completed", "cancelled"] as const
+const EDITABLE_STATUSES = ["pending", "processing", "completed", "cancelled"] as const
+const PAGE_SIZE = 20
 
 function AdminOrdersPage() {
-  const [status, setStatus] = useState<(typeof STATUSES)[number]>("all");
-  const queryClient = useQueryClient();
+  const [page, setPage] = useState(1)
+  const [status, setStatus] = useState<(typeof STATUSES)[number]>("all")
+  const [search, setSearch] = useState("")
+  const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
-    queryKey: ["admin-orders", status],
+    queryKey: ["admin-orders", page, status, search],
     queryFn: () =>
-      api.get<{ items: OrderRow[]; total: number }>("/orders", {
+      api.get<{ items: OrderRow[]; total: number; page: number; pageSize: number }>("/orders", {
+        page,
+        pageSize: PAGE_SIZE,
         status: status === "all" ? undefined : status,
-        pageSize: 100,
+        search: search || undefined,
       }),
-  });
+  })
 
   const updateMutation = useMutation({
     mutationFn: ({ id, newStatus }: { id: number; newStatus: string }) =>
       api.patch(`/orders/${id}`, { status: newStatus }),
     onSuccess: () => {
-      toast.success("Order updated.");
-      queryClient.invalidateQueries({ queryKey: ["admin-orders"] });
+      toast.success("Order updated.")
+      queryClient.invalidateQueries({ queryKey: ["admin-orders"] })
     },
     onError: () => toast.error("Couldn't update the order."),
-  });
+  })
 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">Orders</h1>
-        <Select value={status} onValueChange={(v) => setStatus(v as (typeof STATUSES)[number])}>
-          <SelectTrigger className="w-40">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUSES.map((s) => (
-              <SelectItem key={s} value={s} className="capitalize">
-                {s}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-2">
+          <div className="relative w-48">
+            <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
+              className="pl-8"
+            />
+          </div>
+          <Select
+            value={status}
+            onValueChange={(v) => {
+              setStatus(v as (typeof STATUSES)[number])
+              setPage(1)
+            }}
+          >
+            <SelectTrigger className="w-36">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s} className="capitalize">
+                  {s}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
@@ -120,7 +148,15 @@ function AdminOrdersPage() {
             ))}
           </TableBody>
         </Table>
+        {data && (
+          <Pagination
+            page={data.page}
+            pageSize={data.pageSize}
+            total={data.total}
+            onPageChange={setPage}
+          />
+        )}
       </div>
     </div>
-  );
+  )
 }

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "#/lib/api-client";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx";
@@ -20,6 +21,9 @@ import {
   SelectValue,
 } from "#/components/ui/select.tsx";
 import { Badge } from "#/components/ui/badge";
+import { RoomNumberBadge } from "#/components/room-number-badge";
+import { GenderBadge } from "#/components/gender-badge";
+import { Pagination } from "#/components/pagination";
 
 export const Route = createFileRoute("/admin/_admin/reports")({
   component: ReportsPage,
@@ -45,16 +49,29 @@ interface RepairReportRow {
 }
 
 function ReportsPage() {
+  const [studentsPage, setStudentsPage] = useState(1)
+  const [repairsPage, setRepairsPage] = useState(1)
+  const STUDENTS_PAGE_SIZE = 5
+  const REPAIRS_PAGE_SIZE = 10
+
   const { data: studentsData } = useQuery({
-    queryKey: ["reports", "students"],
-    queryFn: () => api.get<{ students: StudentReportRow[] }>("/reports/students"),
+    queryKey: ["reports", "students", studentsPage],
+    queryFn: () =>
+      api.get<{ students: StudentReportRow[]; total: number; page: number; pageSize: number }>(
+        "/reports/students",
+        { page: studentsPage, pageSize: STUDENTS_PAGE_SIZE },
+      ),
   });
   const { data: repairsData } = useQuery({
-    queryKey: ["reports", "repairs"],
+    queryKey: ["reports", "repairs", repairsPage],
     queryFn: () =>
-      api.get<{ statusCounts: { status: string; count: number }[]; items: RepairReportRow[] }>(
-        "/reports/repairs",
-      ),
+      api.get<{
+        statusCounts: { status: string; count: number }[]
+        items: RepairReportRow[]
+        total: number
+        page: number
+        pageSize: number
+      }>("/reports/repairs", { page: repairsPage, pageSize: REPAIRS_PAGE_SIZE }),
   });
 
   return (
@@ -82,14 +99,14 @@ function ReportsPage() {
                 <TableRow key={s.id}>
                   <TableCell className="font-medium">{s.full_name}</TableCell>
                   <TableCell>{s.registration_number}</TableCell>
-                  <TableCell>{s.room_number}</TableCell>
+                  <TableCell>
+                    <RoomNumberBadge roomNumber={s.room_number} />
+                  </TableCell>
                   <TableCell>
                     <Badge variant="secondary">Level {s.level}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={s.gender === "male" ? "info" : "purple"} className="capitalize">
-                      {s.gender}
-                    </Badge>
+                    <GenderBadge gender={s.gender as "male" | "female" | "mixed"} />
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {new Date(s.registered_at).toLocaleString()}
@@ -98,6 +115,14 @@ function ReportsPage() {
               ))}
             </TableBody>
           </Table>
+          {studentsData && (
+            <Pagination
+              page={studentsData.page}
+              pageSize={studentsData.pageSize}
+              total={studentsData.total}
+              onPageChange={setStudentsPage}
+            />
+          )}
         </CardContent>
       </Card>
 
@@ -127,7 +152,9 @@ function ReportsPage() {
               {repairsData?.items.map((r) => (
                 <TableRow key={r.id}>
                   <TableCell className="font-medium">{r.student_name}</TableCell>
-                  <TableCell>{r.room_number}</TableCell>
+                  <TableCell>
+                    <RoomNumberBadge roomNumber={r.room_number} />
+                  </TableCell>
                   <TableCell>
                     <StatusBadge status={r.status} />
                   </TableCell>
@@ -138,6 +165,14 @@ function ReportsPage() {
               ))}
             </TableBody>
           </Table>
+          {repairsData && (
+            <Pagination
+              page={repairsData.page}
+              pageSize={repairsData.pageSize}
+              total={repairsData.total}
+              onPageChange={setRepairsPage}
+            />
+          )}
         </CardContent>
       </Card>
     </div>

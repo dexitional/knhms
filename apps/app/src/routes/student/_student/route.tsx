@@ -35,10 +35,10 @@ function StudentLayout() {
     <div className="flex min-h-screen bg-background">
       <aside className="hidden w-64 shrink-0 flex-col border-r border-border bg-card sm:flex">
         <div className="flex items-center gap-3 border-b border-border px-6 py-5">
-          <img src={asset("logo.png")} alt="" className="h-9 w-auto" />
+          <img src={asset("logo.png")} alt="" className="h-12 w-auto" />
           <div className="leading-tight">
-            <p className="text-sm font-bold">KNH</p>
-            <p className="text-[10px] tracking-widest text-primary uppercase">Student Portal</p>
+            <p className="text-lg font-bold tracking-widest">KNH</p>
+            <p className="text-xs tracking-widest text-primary uppercase">Student Portal</p>
           </div>
         </div>
         <nav className="flex flex-1 flex-col gap-1 p-3">
