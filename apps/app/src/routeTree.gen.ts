@@ -22,6 +22,7 @@ import { Route as StudentLoginRouteImport } from './routes/student/login'
 import { Route as AdminAdminIndexRouteImport } from './routes/admin/_admin/index'
 import { Route as AdminAdminAccountRouteImport } from './routes/admin/_admin/account'
 import { Route as AdminAdminReportsRouteImport } from './routes/admin/_admin/reports'
+import { Route as PrintRepairsRequestIdRouteImport } from './routes/print/repairs/$requestId'
 import { Route as StudentStudentIndexRouteImport } from './routes/student/_student/index'
 import { Route as StudentStudentProfileRouteImport } from './routes/student/_student/profile'
 import { Route as StudentStudentSuggestionsRouteImport } from './routes/student/_student/suggestions'
@@ -104,6 +105,11 @@ const AdminAdminReportsRoute = AdminAdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
   getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const PrintRepairsRequestIdRoute = PrintRepairsRequestIdRouteImport.update({
+  id: '/print/repairs/$requestId',
+  path: '/print/repairs/$requestId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const StudentStudentIndexRoute = StudentStudentIndexRouteImport.update({
   id: '/',
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/student/login': typeof StudentLoginRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
+  '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin/': typeof AdminAdminIndexRoute
@@ -245,6 +252,7 @@ export interface FileRoutesByTo {
   '/': typeof WebIndexRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
+  '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin': typeof AdminAdminIndexRoute
@@ -279,6 +287,7 @@ export interface FileRoutesById {
   '/_web/': typeof WebIndexRoute
   '/admin/_admin/account': typeof AdminAdminAccountRoute
   '/admin/_admin/reports': typeof AdminAdminReportsRoute
+  '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/student/_student/profile': typeof StudentStudentProfileRoute
   '/student/_student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin/_admin/': typeof AdminAdminIndexRoute
@@ -313,6 +322,7 @@ export interface FileRouteTypes {
     | '/student/login'
     | '/admin/account'
     | '/admin/reports'
+    | '/print/repairs/$requestId'
     | '/student/profile'
     | '/student/suggestions'
     | '/admin/'
@@ -343,6 +353,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/account'
     | '/admin/reports'
+    | '/print/repairs/$requestId'
     | '/student/profile'
     | '/student/suggestions'
     | '/admin'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/_web/'
     | '/admin/_admin/account'
     | '/admin/_admin/reports'
+    | '/print/repairs/$requestId'
     | '/student/_student/profile'
     | '/student/_student/suggestions'
     | '/admin/_admin/'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   ApiSplatRoute: typeof ApiSplatRoute
   StudentForgotPinRoute: typeof StudentForgotPinRoute
   StudentLoginRoute: typeof StudentLoginRoute
+  PrintRepairsRequestIdRoute: typeof PrintRepairsRequestIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/reports'
       preLoaderRoute: typeof AdminAdminReportsRouteImport
       parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/print/repairs/$requestId': {
+      id: '/print/repairs/$requestId'
+      path: '/print/repairs/$requestId'
+      fullPath: '/print/repairs/$requestId'
+      preLoaderRoute: typeof PrintRepairsRequestIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/student/_student/': {
       id: '/student/_student/'
@@ -714,6 +734,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSplatRoute: ApiSplatRoute,
   StudentForgotPinRoute: StudentForgotPinRoute,
   StudentLoginRoute: StudentLoginRoute,
+  PrintRepairsRequestIdRoute: PrintRepairsRequestIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

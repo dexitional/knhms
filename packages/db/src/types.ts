@@ -1,4 +1,4 @@
-export type AdminRole = "super_admin" | "admin" | "staff";
+export type AdminRole = "super_admin" | "admin" | "staff" | "tutor" | "technician";
 
 export interface AdminRow {
   id: number;

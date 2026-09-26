@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
+import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
 import {
   createRepairRequestSchema,
   listRepairsQuerySchema,
@@ -43,7 +43,7 @@ export const repairsRoute = new Hono()
   })
   .patch(
     "/:id",
-    requireAdminRole(ANY_ADMIN),
+    requireAdminRole(ADMIN_ONLY),
     zValidator("json", updateRepairAdminSchema),
     async (c) => {
       const request = await service.updateRepairRequest(Number(c.req.param("id")), c.req.valid("json"));

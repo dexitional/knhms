@@ -26,7 +26,7 @@ export const Route = createFileRoute("/admin/_admin/staff/new")({
 const schema = z.object({
   fullName: z.string().min(2, "Required").max(150),
   staffNumber: z.string().min(1, "Required").max(50),
-  role: z.enum(["super_admin", "admin", "staff"]),
+  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician"]),
   position: z.string().max(100).optional(),
   phoneNumber: z.string().max(20).optional(),
   photoUrl: z.string().url().optional(),
@@ -100,6 +100,8 @@ function NewStaffPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="tutor">Tutor</SelectItem>
+                        <SelectItem value="technician">Technician</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                       </SelectContent>

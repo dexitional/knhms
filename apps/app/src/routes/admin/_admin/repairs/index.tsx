@@ -1,10 +1,12 @@
 import { useState } from "react"
-import { createFileRoute, Link } from "@tanstack/react-router"
-import { useQuery } from "@tanstack/react-query"
+import { createFileRoute } from "@tanstack/react-router"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { Search } from "lucide-react"
-import { api } from "#/lib/api-client"
+import { api, ApiError } from "#/lib/api-client"
 import { Input } from "#/components/ui/input.tsx"
 import { StatusBadge } from "#/components/status-badge"
+import { Button } from "#/components/ui/button.tsx"
+import { toast } from "sonner"
 import {
   Table,
   TableBody,
@@ -22,6 +24,8 @@ import {
   SelectValue,
 } from "#/components/ui/select.tsx"
 import { Pagination } from "#/components/pagination"
+import { RoomNumberBadge } from "#/components/room-number-badge"
+import { Pencil } from "lucide-react"
 
 export const Route = createFileRoute("/admin/_admin/repairs/")({
   component: AdminRepairsPage,
@@ -38,12 +42,15 @@ interface RepairRow {
   created_at: string
 }
 
-const STATUSES = ["all", "pending", "approved", "assigned", "completed"] as const
+const STATUSES = ["pending", "approved", "assigned", "completed"] as const
+const FILTER_STATUSES = ["all", "pending", "approved", "assigned", "completed"] as const
 const PAGE_SIZE = 20
 
 function AdminRepairsPage() {
+  const { admin: currentAdmin } = Route.useRouteContext()
+  const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
-  const [status, setStatus] = useState<(typeof STATUSES)[number]>("all")
+  const [status, setStatus] = useState<(typeof FILTER_STATUSES)[number]>("all")
   const [search, setSearch] = useState("")
 
   const { data, isLoading } = useQuery({
@@ -56,6 +63,18 @@ function AdminRepairsPage() {
         search: search || undefined,
       }),
   })
+
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ id, status }: { id: number; status: (typeof STATUSES)[number] }) =>
+      api.patch(`/repairs/${id}`, { status }),
+    onSuccess: () => {
+      toast.success("Status updated.")
+      queryClient.invalidateQueries({ queryKey: ["admin-repairs"] })
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't update status."),
+  })
+
+  const canEdit = currentAdmin.role === "super_admin" || currentAdmin.role === "admin"
 
   return (
     <div className="flex flex-col gap-6">
@@ -106,21 +125,23 @@ function AdminRepairsPage() {
               <TableHead>Status</TableHead>
               <TableHead>Assigned To</TableHead>
               <TableHead>Submitted</TableHead>
+              {canEdit && (
+                <>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Actions</TableHead>
+                </>
+              )}
             </TableRow>
           </TableHeader>
-          <TableBody>
+<TableBody>
             {data?.items.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>
-                  <Link
-                    to="/admin/repairs/$requestId"
-                    params={{ requestId: String(r.id) }}
-                    className="font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    {r.student_name}
-                  </Link>
+                  {r.student_name}
                 </TableCell>
-                <TableCell>{r.room_number}</TableCell>
+                <TableCell>
+                  <RoomNumberBadge roomNumber={r.room_number} />
+                </TableCell>
                 <TableCell>{r.category ?? <TableEmptyValue />}</TableCell>
                 <TableCell>
                   <StatusBadge status={r.status} />
@@ -131,6 +152,46 @@ function AdminRepairsPage() {
                 <TableCell className="text-muted-foreground">
                   {new Date(r.created_at).toLocaleDateString()}
                 </TableCell>
+                {canEdit && (
+                  <>
+                    <TableCell>
+                      <Select
+                        value={r.status}
+                        onValueChange={(newStatus) => {
+                          if (newStatus !== r.status) {
+                            updateStatusMutation.mutate({ id: r.id, status: newStatus as (typeof STATUSES)[number] })
+                          }
+                        }}
+                        disabled={updateStatusMutation.isPending}
+                      >
+                        <SelectTrigger className="w-[100px]">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {STATUSES.map((s) => (
+                            <SelectItem key={s} value={s} className="capitalize">
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={`Edit repair for ${r.student_name}`}
+                        onClick={() => {
+                          // Navigate to detail page for editing
+                          window.location.href = `/admin/repairs/${r.id}`;
+                        }}
+                      >
+                        <Pencil className="size-4" />
+                      </Button>
+                    </TableCell>
+                  </>
+                )}
               </TableRow>
             ))}
           </TableBody>

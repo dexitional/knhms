@@ -30,6 +30,8 @@ interface StudentRow {
   level: string
   gender: string
   email: string
+  phone_country_code: string
+  phone_number: string
   passport_photo_url: string
 }
 
@@ -80,6 +82,7 @@ function StudentsPage() {
               <TableHead>Level</TableHead>
               <TableHead>Gender</TableHead>
               <TableHead>Email</TableHead>
+              <TableHead>Phone</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -116,6 +119,7 @@ function StudentsPage() {
                   <GenderBadge gender={student.gender as "male" | "female" | "mixed"} />
                 </TableCell>
                 <TableCell className="text-muted-foreground">{student.email}</TableCell>
+                <TableCell className="text-muted-foreground">{student.phone_country_code} {student.phone_number}</TableCell>
               </TableRow>
             ))}
           </TableBody>

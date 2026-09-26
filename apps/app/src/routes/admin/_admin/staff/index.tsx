@@ -5,7 +5,7 @@ import { z } from "zod"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Pencil, Plus, Search, RotateCcw } from "lucide-react"
+import { Pencil, Plus, Search, RotateCcw, Trash2 } from "lucide-react"
 import { api, ApiError } from "#/lib/api-client"
 import { Button } from "#/components/ui/button.tsx"
 import { Badge } from "#/components/ui/badge.tsx"
@@ -53,7 +53,7 @@ interface AdminRow {
 
 const adminSchema = z.object({
   fullName: z.string().min(2, "Required").max(150),
-  role: z.enum(["super_admin", "admin", "staff"]),
+  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician"]),
   position: z.string().max(100).optional(),
   phoneNumber: z.string().max(20).optional(),
   isActive: z.boolean(),
@@ -98,11 +98,20 @@ function StaffPage() {
     onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't reset password."),
   })
 
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => api.delete(`/admins/${id}`),
+    onSuccess: () => {
+      toast.success("Staff account deactivated.")
+      queryClient.invalidateQueries({ queryKey: ["admins"] })
+    },
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't deactivate staff."),
+  })
+
   const openEdit = (a: AdminRow) => {
     setEditingAdmin(a)
     editForm.reset({
       fullName: a.full_name,
-      role: a.role as "super_admin" | "admin" | "staff",
+      role: a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician",
       position: a.position ?? "",
       phoneNumber: a.phone_number ?? "",
       isActive: a.is_active === 1,
@@ -176,7 +185,7 @@ function StaffPage() {
                   </TableCell>
                   <TableCell>{a.staff_number}</TableCell>
                   <TableCell>
-                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff"} />
+                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician"} />
                   </TableCell>
                   <TableCell>{a.position ?? <TableEmptyValue />}</TableCell>
                   <TableCell>{a.phone_number ?? <TableEmptyValue />}</TableCell>
@@ -210,6 +219,19 @@ function StaffPage() {
                           title="Reset password and send new one via SMS"
                         >
                           <RotateCcw className="size-4 text-primary" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          aria-label={`Deactivate ${a.full_name}`}
+                          onClick={() => {
+                            if (confirm(`Deactivate ${a.full_name}'s account? This will disable their login access.`))
+                              deleteMutation.mutate(a.id)
+                          }}
+                          disabled={deleteMutation.isPending}
+                          title="Deactivate account"
+                        >
+                          <Trash2 className="size-4 text-destructive" />
                         </Button>
                       </div>
                     )}
@@ -254,6 +276,8 @@ function StaffPage() {
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="tutor">Tutor</SelectItem>
+                        <SelectItem value="technician">Technician</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

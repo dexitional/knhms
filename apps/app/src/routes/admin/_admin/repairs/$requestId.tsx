@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm, Controller } from "react-hook-form";
 import { toast } from "sonner";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Printer } from "lucide-react";
 import { api } from "#/lib/api-client";
 import { Button } from "#/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx";
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "#/components/ui/select.tsx";
 import { StatusBadge } from "#/components/status-badge";
+import { RoomNumberBadge } from "#/components/room-number-badge";
 
 export const Route = createFileRoute("/admin/_admin/repairs/$requestId")({
   component: RepairDetailPage,
@@ -89,12 +90,20 @@ function RepairDetailPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">
-      <Button asChild variant="ghost" size="sm" className="w-fit">
-        <Link to="/admin/repairs">
-          <ArrowLeft className="size-4" />
-          Back to Repairs
-        </Link>
-      </Button>
+      <div className="flex items-center justify-between">
+        <Button asChild variant="ghost" size="sm" className="w-fit">
+          <Link to="/admin/repairs">
+            <ArrowLeft className="size-4" />
+            Back to Repairs
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm">
+          <a href={`/print/repairs/${requestId}`} target="_blank" rel="noreferrer">
+            <Printer className="size-4 mr-1" />
+            Print
+          </a>
+        </Button>
+      </div>
 
       <Card>
         <CardHeader>
@@ -104,12 +113,13 @@ function RepairDetailPage() {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <div className="text-sm text-muted-foreground">
-            <p>
-              <span className="font-medium text-foreground">{r.student_name}</span> ({r.registration_number}) &middot; Room {r.room_number}
-            </p>
-            <p>Submitted {new Date(r.created_at).toLocaleString()}</p>
-          </div>
+<div className="text-sm text-muted-foreground">
+             <p>
+               <span className="font-medium text-foreground">{r.student_name}</span> ({r.registration_number}) &middot;
+               <RoomNumberBadge roomNumber={r.room_number} />
+             </p>
+             <p>Submitted {new Date(r.created_at).toLocaleString()}</p>
+           </div>
           <p className="rounded-md bg-secondary/50 px-3 py-2 text-sm">{r.description}</p>
           {r.student_remarks && (
             <p className="rounded-md border border-border px-3 py-2 text-sm">

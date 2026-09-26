@@ -123,6 +123,8 @@ function StaffDetailPage() {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="staff">Staff</SelectItem>
+                        <SelectItem value="tutor">Tutor</SelectItem>
+                        <SelectItem value="technician">Technician</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                       </SelectContent>
