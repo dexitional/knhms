@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS directory_entries (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  category ENUM('personnel', 'business', 'executive') NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  subtitle VARCHAR(255) NULL,
+  phone VARCHAR(30) NULL,
+  email VARCHAR(150) NULL,
+  location VARCHAR(255) NULL,
+  hours VARCHAR(150) NULL,
+  photo_url VARCHAR(500) NULL,
+  map_query VARCHAR(255) NULL,
+  website_url VARCHAR(500) NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_directory_entries_category (category, is_active, sort_order)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

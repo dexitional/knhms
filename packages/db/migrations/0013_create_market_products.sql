@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS market_products (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  category_id INT UNSIGNED NOT NULL,
+  name VARCHAR(200) NOT NULL,
+  description TEXT NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  old_price DECIMAL(10, 2) NULL,
+  image_url VARCHAR(500) NULL,
+  item_condition ENUM('new', 'used') NOT NULL DEFAULT 'new',
+  audience ENUM('all', 'students', 'staff') NOT NULL DEFAULT 'all',
+  rating DECIMAL(2, 1) NULL,
+  seller_name VARCHAR(150) NOT NULL,
+  seller_phone VARCHAR(30) NULL,
+  seller_location VARCHAR(255) NULL,
+  is_featured TINYINT(1) NOT NULL DEFAULT 0,
+  sort_order INT NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_market_products_category (category_id, is_active),
+  CONSTRAINT fk_market_products_category FOREIGN KEY (category_id) REFERENCES market_categories (id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

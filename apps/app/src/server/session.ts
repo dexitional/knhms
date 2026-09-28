@@ -11,11 +11,13 @@ import { getCookie } from "@tanstack/react-start/server";
 
 export const STUDENT_SESSION_COOKIE = "knh_student_session";
 export const ADMIN_SESSION_COOKIE = "knh_admin_session";
+export const SELLER_SESSION_COOKIE = "knh_seller_session";
 
 export const STUDENT_SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 export const ADMIN_SESSION_TTL_SECONDS = 60 * 60 * 12; // 12 hours
+export const SELLER_SESSION_TTL_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-export type { StudentSessionUser, AdminSessionUser } from "./session-core.js";
+export type { StudentSessionUser, AdminSessionUser, SellerSessionUser } from "./session-core.js";
 
 export const getStudentSession = createServerFn({ method: "GET" }).handler(async () => {
   const { readStudentIdFromToken, getStudentSessionUser } = await import("./session-core.js");
@@ -31,4 +33,12 @@ export const getAdminSession = createServerFn({ method: "GET" }).handler(async (
   const id = await readAdminIdFromToken(token);
   if (!id) return null;
   return getAdminSessionUser(id);
+});
+
+export const getSellerSession = createServerFn({ method: "GET" }).handler(async () => {
+  const { readSellerIdFromToken, getSellerSessionUser } = await import("./session-core.js");
+  const token = getCookie(SELLER_SESSION_COOKIE);
+  const id = await readSellerIdFromToken(token);
+  if (!id) return null;
+  return getSellerSessionUser(id);
 });

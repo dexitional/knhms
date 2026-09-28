@@ -11,11 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebRouteRouteImport } from './routes/_web/route'
 import { Route as WebIndexRouteImport } from './routes/_web/index'
+import { Route as WebEMarketRouteImport } from './routes/_web/e-market'
+import { Route as WebFreshmenRouteImport } from './routes/_web/freshmen'
+import { Route as WebKnhHubRouteImport } from './routes/_web/knh-hub'
 import { Route as WebRegisterRouteImport } from './routes/_web/register'
+import { Route as WebYellowPagesRouteImport } from './routes/_web/yellow-pages'
 import { Route as AdminAdminRouteRouteImport } from './routes/admin/_admin/route'
 import { Route as AdminForgotPasswordRouteImport } from './routes/admin/forgot-password'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as ApiSplatRouteImport } from './routes/api/$'
+import { Route as SellerSellerRouteRouteImport } from './routes/seller/_seller/route'
+import { Route as SellerLoginRouteImport } from './routes/seller/login'
+import { Route as SellerRegisterRouteImport } from './routes/seller/register'
 import { Route as StudentStudentRouteRouteImport } from './routes/student/_student/route'
 import { Route as StudentForgotPinRouteImport } from './routes/student/forgot-pin'
 import { Route as StudentLoginRouteImport } from './routes/student/login'
@@ -23,20 +30,30 @@ import { Route as AdminAdminIndexRouteImport } from './routes/admin/_admin/index
 import { Route as AdminAdminAccountRouteImport } from './routes/admin/_admin/account'
 import { Route as AdminAdminReportsRouteImport } from './routes/admin/_admin/reports'
 import { Route as PrintRepairsRequestIdRouteImport } from './routes/print/repairs/$requestId'
+import { Route as SellerSellerIndexRouteImport } from './routes/seller/_seller/index'
+import { Route as SellerSellerAccountRouteImport } from './routes/seller/_seller/account'
+import { Route as SellerSellerBillingRouteImport } from './routes/seller/_seller/billing'
+import { Route as SellerSellerMenuRouteImport } from './routes/seller/_seller/menu'
+import { Route as SellerSellerProductsRouteImport } from './routes/seller/_seller/products'
 import { Route as StudentStudentIndexRouteImport } from './routes/student/_student/index'
 import { Route as StudentStudentProfileRouteImport } from './routes/student/_student/profile'
 import { Route as StudentStudentSuggestionsRouteImport } from './routes/student/_student/suggestions'
+import { Route as AdminAdminEMarketIndexRouteImport } from './routes/admin/_admin/e-market/index'
+import { Route as AdminAdminHubIndexRouteImport } from './routes/admin/_admin/hub/index'
 import { Route as AdminAdminOrdersIndexRouteImport } from './routes/admin/_admin/orders/index'
 import { Route as AdminAdminRepairsIndexRouteImport } from './routes/admin/_admin/repairs/index'
 import { Route as AdminAdminRepairsRequestIdRouteImport } from './routes/admin/_admin/repairs/$requestId'
 import { Route as AdminAdminRoomsIndexRouteImport } from './routes/admin/_admin/rooms/index'
 import { Route as AdminAdminRoomsUploadRouteImport } from './routes/admin/_admin/rooms/upload'
+import { Route as AdminAdminSellersIndexRouteImport } from './routes/admin/_admin/sellers/index'
+import { Route as AdminAdminSellersSellerIdRouteImport } from './routes/admin/_admin/sellers/$sellerId'
 import { Route as AdminAdminStaffIndexRouteImport } from './routes/admin/_admin/staff/index'
 import { Route as AdminAdminStaffStaffIdRouteImport } from './routes/admin/_admin/staff/$staffId'
 import { Route as AdminAdminStaffNewRouteImport } from './routes/admin/_admin/staff/new'
 import { Route as AdminAdminStudentsIndexRouteImport } from './routes/admin/_admin/students/index'
 import { Route as AdminAdminStudentsStudentIdRouteImport } from './routes/admin/_admin/students/$studentId'
 import { Route as AdminAdminSuggestionsIndexRouteImport } from './routes/admin/_admin/suggestions/index'
+import { Route as AdminAdminYellowPagesIndexRouteImport } from './routes/admin/_admin/yellow-pages/index'
 import { Route as StudentStudentOrdersIndexRouteImport } from './routes/student/_student/orders/index'
 import { Route as StudentStudentOrdersNewRouteImport } from './routes/student/_student/orders/new'
 import { Route as StudentStudentRepairsIndexRouteImport } from './routes/student/_student/repairs/index'
@@ -51,9 +68,29 @@ const WebIndexRoute = WebIndexRouteImport.update({
   path: '/',
   getParentRoute: () => WebRouteRoute,
 } as any)
+const WebEMarketRoute = WebEMarketRouteImport.update({
+  id: '/e-market',
+  path: '/e-market',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebFreshmenRoute = WebFreshmenRouteImport.update({
+  id: '/freshmen',
+  path: '/freshmen',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebKnhHubRoute = WebKnhHubRouteImport.update({
+  id: '/knh-hub',
+  path: '/knh-hub',
+  getParentRoute: () => WebRouteRoute,
+} as any)
 const WebRegisterRoute = WebRegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebYellowPagesRoute = WebYellowPagesRouteImport.update({
+  id: '/yellow-pages',
+  path: '/yellow-pages',
   getParentRoute: () => WebRouteRoute,
 } as any)
 const AdminAdminRouteRoute = AdminAdminRouteRouteImport.update({
@@ -74,6 +111,21 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
 const ApiSplatRoute = ApiSplatRouteImport.update({
   id: '/api/$',
   path: '/api/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellerSellerRouteRoute = SellerSellerRouteRouteImport.update({
+  id: '/seller/_seller',
+  path: '/seller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellerLoginRoute = SellerLoginRouteImport.update({
+  id: '/seller/login',
+  path: '/seller/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SellerRegisterRoute = SellerRegisterRouteImport.update({
+  id: '/seller/register',
+  path: '/seller/register',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StudentStudentRouteRoute = StudentStudentRouteRouteImport.update({
@@ -111,6 +163,31 @@ const PrintRepairsRequestIdRoute = PrintRepairsRequestIdRouteImport.update({
   path: '/print/repairs/$requestId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SellerSellerIndexRoute = SellerSellerIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
+const SellerSellerAccountRoute = SellerSellerAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
+const SellerSellerBillingRoute = SellerSellerBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
+const SellerSellerMenuRoute = SellerSellerMenuRouteImport.update({
+  id: '/menu',
+  path: '/menu',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
+const SellerSellerProductsRoute = SellerSellerProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
 const StudentStudentIndexRoute = StudentStudentIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -127,6 +204,16 @@ const StudentStudentSuggestionsRoute =
     path: '/suggestions',
     getParentRoute: () => StudentStudentRouteRoute,
   } as any)
+const AdminAdminEMarketIndexRoute = AdminAdminEMarketIndexRouteImport.update({
+  id: '/e-market/',
+  path: '/e-market/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminHubIndexRoute = AdminAdminHubIndexRouteImport.update({
+  id: '/hub/',
+  path: '/hub/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
 const AdminAdminOrdersIndexRoute = AdminAdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -153,6 +240,17 @@ const AdminAdminRoomsUploadRoute = AdminAdminRoomsUploadRouteImport.update({
   path: '/rooms/upload',
   getParentRoute: () => AdminAdminRouteRoute,
 } as any)
+const AdminAdminSellersIndexRoute = AdminAdminSellersIndexRouteImport.update({
+  id: '/sellers/',
+  path: '/sellers/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
+const AdminAdminSellersSellerIdRoute =
+  AdminAdminSellersSellerIdRouteImport.update({
+    id: '/sellers/$sellerId',
+    path: '/sellers/$sellerId',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 const AdminAdminStaffIndexRoute = AdminAdminStaffIndexRouteImport.update({
   id: '/staff/',
   path: '/staff/',
@@ -185,6 +283,12 @@ const AdminAdminSuggestionsIndexRoute =
     path: '/suggestions/',
     getParentRoute: () => AdminAdminRouteRoute,
   } as any)
+const AdminAdminYellowPagesIndexRoute =
+  AdminAdminYellowPagesIndexRouteImport.update({
+    id: '/yellow-pages/',
+    path: '/yellow-pages/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 const StudentStudentOrdersIndexRoute =
   StudentStudentOrdersIndexRouteImport.update({
     id: '/orders/',
@@ -212,64 +316,97 @@ const StudentStudentRepairsNewRoute =
 export interface FileRoutesByFullPath {
   '/': typeof WebIndexRoute
   '/admin': typeof AdminAdminRouteRouteWithChildren
+  '/seller': typeof SellerSellerRouteRouteWithChildren
   '/student': typeof StudentStudentRouteRouteWithChildren
+  '/e-market': typeof WebEMarketRoute
+  '/freshmen': typeof WebFreshmenRoute
+  '/knh-hub': typeof WebKnhHubRoute
   '/register': typeof WebRegisterRoute
+  '/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/$': typeof ApiSplatRoute
+  '/seller/login': typeof SellerLoginRoute
+  '/seller/register': typeof SellerRegisterRoute
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
+  '/seller/account': typeof SellerSellerAccountRoute
+  '/seller/billing': typeof SellerSellerBillingRoute
+  '/seller/menu': typeof SellerSellerMenuRoute
+  '/seller/products': typeof SellerSellerProductsRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin/': typeof AdminAdminIndexRoute
+  '/seller/': typeof SellerSellerIndexRoute
   '/student/': typeof StudentStudentIndexRoute
   '/admin/repairs/$requestId': typeof AdminAdminRepairsRequestIdRoute
   '/admin/rooms/upload': typeof AdminAdminRoomsUploadRoute
+  '/admin/sellers/$sellerId': typeof AdminAdminSellersSellerIdRoute
   '/admin/staff/$staffId': typeof AdminAdminStaffStaffIdRoute
   '/admin/staff/new': typeof AdminAdminStaffNewRoute
   '/admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/e-market/': typeof AdminAdminEMarketIndexRoute
+  '/admin/hub/': typeof AdminAdminHubIndexRoute
   '/admin/orders/': typeof AdminAdminOrdersIndexRoute
   '/admin/repairs/': typeof AdminAdminRepairsIndexRoute
   '/admin/rooms/': typeof AdminAdminRoomsIndexRoute
+  '/admin/sellers/': typeof AdminAdminSellersIndexRoute
   '/admin/staff/': typeof AdminAdminStaffIndexRoute
   '/admin/students/': typeof AdminAdminStudentsIndexRoute
   '/admin/suggestions/': typeof AdminAdminSuggestionsIndexRoute
+  '/admin/yellow-pages/': typeof AdminAdminYellowPagesIndexRoute
   '/student/orders/': typeof StudentStudentOrdersIndexRoute
   '/student/repairs/': typeof StudentStudentRepairsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/e-market': typeof WebEMarketRoute
+  '/freshmen': typeof WebFreshmenRoute
+  '/knh-hub': typeof WebKnhHubRoute
   '/register': typeof WebRegisterRoute
+  '/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/$': typeof ApiSplatRoute
+  '/seller/login': typeof SellerLoginRoute
+  '/seller/register': typeof SellerRegisterRoute
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
   '/': typeof WebIndexRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
+  '/seller/account': typeof SellerSellerAccountRoute
+  '/seller/billing': typeof SellerSellerBillingRoute
+  '/seller/menu': typeof SellerSellerMenuRoute
+  '/seller/products': typeof SellerSellerProductsRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin': typeof AdminAdminIndexRoute
+  '/seller': typeof SellerSellerIndexRoute
   '/student': typeof StudentStudentIndexRoute
   '/admin/repairs/$requestId': typeof AdminAdminRepairsRequestIdRoute
   '/admin/rooms/upload': typeof AdminAdminRoomsUploadRoute
+  '/admin/sellers/$sellerId': typeof AdminAdminSellersSellerIdRoute
   '/admin/staff/$staffId': typeof AdminAdminStaffStaffIdRoute
   '/admin/staff/new': typeof AdminAdminStaffNewRoute
   '/admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/e-market': typeof AdminAdminEMarketIndexRoute
+  '/admin/hub': typeof AdminAdminHubIndexRoute
   '/admin/orders': typeof AdminAdminOrdersIndexRoute
   '/admin/repairs': typeof AdminAdminRepairsIndexRoute
   '/admin/rooms': typeof AdminAdminRoomsIndexRoute
+  '/admin/sellers': typeof AdminAdminSellersIndexRoute
   '/admin/staff': typeof AdminAdminStaffIndexRoute
   '/admin/students': typeof AdminAdminStudentsIndexRoute
   '/admin/suggestions': typeof AdminAdminSuggestionsIndexRoute
+  '/admin/yellow-pages': typeof AdminAdminYellowPagesIndexRoute
   '/student/orders': typeof StudentStudentOrdersIndexRoute
   '/student/repairs': typeof StudentStudentRepairsIndexRoute
 }
@@ -277,34 +414,51 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_web': typeof WebRouteRouteWithChildren
   '/admin/_admin': typeof AdminAdminRouteRouteWithChildren
+  '/seller/_seller': typeof SellerSellerRouteRouteWithChildren
   '/student/_student': typeof StudentStudentRouteRouteWithChildren
+  '/_web/e-market': typeof WebEMarketRoute
+  '/_web/freshmen': typeof WebFreshmenRoute
+  '/_web/knh-hub': typeof WebKnhHubRoute
   '/_web/register': typeof WebRegisterRoute
+  '/_web/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
   '/admin/login': typeof AdminLoginRoute
   '/api/$': typeof ApiSplatRoute
+  '/seller/login': typeof SellerLoginRoute
+  '/seller/register': typeof SellerRegisterRoute
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
   '/_web/': typeof WebIndexRoute
   '/admin/_admin/account': typeof AdminAdminAccountRoute
   '/admin/_admin/reports': typeof AdminAdminReportsRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
+  '/seller/_seller/account': typeof SellerSellerAccountRoute
+  '/seller/_seller/billing': typeof SellerSellerBillingRoute
+  '/seller/_seller/menu': typeof SellerSellerMenuRoute
+  '/seller/_seller/products': typeof SellerSellerProductsRoute
   '/student/_student/profile': typeof StudentStudentProfileRoute
   '/student/_student/suggestions': typeof StudentStudentSuggestionsRoute
   '/admin/_admin/': typeof AdminAdminIndexRoute
+  '/seller/_seller/': typeof SellerSellerIndexRoute
   '/student/_student/': typeof StudentStudentIndexRoute
   '/admin/_admin/repairs/$requestId': typeof AdminAdminRepairsRequestIdRoute
   '/admin/_admin/rooms/upload': typeof AdminAdminRoomsUploadRoute
+  '/admin/_admin/sellers/$sellerId': typeof AdminAdminSellersSellerIdRoute
   '/admin/_admin/staff/$staffId': typeof AdminAdminStaffStaffIdRoute
   '/admin/_admin/staff/new': typeof AdminAdminStaffNewRoute
   '/admin/_admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/_student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/_student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/_admin/e-market/': typeof AdminAdminEMarketIndexRoute
+  '/admin/_admin/hub/': typeof AdminAdminHubIndexRoute
   '/admin/_admin/orders/': typeof AdminAdminOrdersIndexRoute
   '/admin/_admin/repairs/': typeof AdminAdminRepairsIndexRoute
   '/admin/_admin/rooms/': typeof AdminAdminRoomsIndexRoute
+  '/admin/_admin/sellers/': typeof AdminAdminSellersIndexRoute
   '/admin/_admin/staff/': typeof AdminAdminStaffIndexRoute
   '/admin/_admin/students/': typeof AdminAdminStudentsIndexRoute
   '/admin/_admin/suggestions/': typeof AdminAdminSuggestionsIndexRoute
+  '/admin/_admin/yellow-pages/': typeof AdminAdminYellowPagesIndexRoute
   '/student/_student/orders/': typeof StudentStudentOrdersIndexRoute
   '/student/_student/repairs/': typeof StudentStudentRepairsIndexRoute
 }
@@ -313,98 +467,148 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/seller'
     | '/student'
+    | '/e-market'
+    | '/freshmen'
+    | '/knh-hub'
     | '/register'
+    | '/yellow-pages'
     | '/admin/forgot-password'
     | '/admin/login'
     | '/api/$'
+    | '/seller/login'
+    | '/seller/register'
     | '/student/forgot-pin'
     | '/student/login'
     | '/admin/account'
     | '/admin/reports'
     | '/print/repairs/$requestId'
+    | '/seller/account'
+    | '/seller/billing'
+    | '/seller/menu'
+    | '/seller/products'
     | '/student/profile'
     | '/student/suggestions'
     | '/admin/'
+    | '/seller/'
     | '/student/'
     | '/admin/repairs/$requestId'
     | '/admin/rooms/upload'
+    | '/admin/sellers/$sellerId'
     | '/admin/staff/$staffId'
     | '/admin/staff/new'
     | '/admin/students/$studentId'
     | '/student/orders/new'
     | '/student/repairs/new'
+    | '/admin/e-market/'
+    | '/admin/hub/'
     | '/admin/orders/'
     | '/admin/repairs/'
     | '/admin/rooms/'
+    | '/admin/sellers/'
     | '/admin/staff/'
     | '/admin/students/'
     | '/admin/suggestions/'
+    | '/admin/yellow-pages/'
     | '/student/orders/'
     | '/student/repairs/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/e-market'
+    | '/freshmen'
+    | '/knh-hub'
     | '/register'
+    | '/yellow-pages'
     | '/admin/forgot-password'
     | '/admin/login'
     | '/api/$'
+    | '/seller/login'
+    | '/seller/register'
     | '/student/forgot-pin'
     | '/student/login'
     | '/'
     | '/admin/account'
     | '/admin/reports'
     | '/print/repairs/$requestId'
+    | '/seller/account'
+    | '/seller/billing'
+    | '/seller/menu'
+    | '/seller/products'
     | '/student/profile'
     | '/student/suggestions'
     | '/admin'
+    | '/seller'
     | '/student'
     | '/admin/repairs/$requestId'
     | '/admin/rooms/upload'
+    | '/admin/sellers/$sellerId'
     | '/admin/staff/$staffId'
     | '/admin/staff/new'
     | '/admin/students/$studentId'
     | '/student/orders/new'
     | '/student/repairs/new'
+    | '/admin/e-market'
+    | '/admin/hub'
     | '/admin/orders'
     | '/admin/repairs'
     | '/admin/rooms'
+    | '/admin/sellers'
     | '/admin/staff'
     | '/admin/students'
     | '/admin/suggestions'
+    | '/admin/yellow-pages'
     | '/student/orders'
     | '/student/repairs'
   id:
     | '__root__'
     | '/_web'
     | '/admin/_admin'
+    | '/seller/_seller'
     | '/student/_student'
+    | '/_web/e-market'
+    | '/_web/freshmen'
+    | '/_web/knh-hub'
     | '/_web/register'
+    | '/_web/yellow-pages'
     | '/admin/forgot-password'
     | '/admin/login'
     | '/api/$'
+    | '/seller/login'
+    | '/seller/register'
     | '/student/forgot-pin'
     | '/student/login'
     | '/_web/'
     | '/admin/_admin/account'
     | '/admin/_admin/reports'
     | '/print/repairs/$requestId'
+    | '/seller/_seller/account'
+    | '/seller/_seller/billing'
+    | '/seller/_seller/menu'
+    | '/seller/_seller/products'
     | '/student/_student/profile'
     | '/student/_student/suggestions'
     | '/admin/_admin/'
+    | '/seller/_seller/'
     | '/student/_student/'
     | '/admin/_admin/repairs/$requestId'
     | '/admin/_admin/rooms/upload'
+    | '/admin/_admin/sellers/$sellerId'
     | '/admin/_admin/staff/$staffId'
     | '/admin/_admin/staff/new'
     | '/admin/_admin/students/$studentId'
     | '/student/_student/orders/new'
     | '/student/_student/repairs/new'
+    | '/admin/_admin/e-market/'
+    | '/admin/_admin/hub/'
     | '/admin/_admin/orders/'
     | '/admin/_admin/repairs/'
     | '/admin/_admin/rooms/'
+    | '/admin/_admin/sellers/'
     | '/admin/_admin/staff/'
     | '/admin/_admin/students/'
     | '/admin/_admin/suggestions/'
+    | '/admin/_admin/yellow-pages/'
     | '/student/_student/orders/'
     | '/student/_student/repairs/'
   fileRoutesById: FileRoutesById
@@ -412,10 +616,13 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   WebRouteRoute: typeof WebRouteRouteWithChildren
   AdminAdminRouteRoute: typeof AdminAdminRouteRouteWithChildren
+  SellerSellerRouteRoute: typeof SellerSellerRouteRouteWithChildren
   StudentStudentRouteRoute: typeof StudentStudentRouteRouteWithChildren
   AdminForgotPasswordRoute: typeof AdminForgotPasswordRoute
   AdminLoginRoute: typeof AdminLoginRoute
   ApiSplatRoute: typeof ApiSplatRoute
+  SellerLoginRoute: typeof SellerLoginRoute
+  SellerRegisterRoute: typeof SellerRegisterRoute
   StudentForgotPinRoute: typeof StudentForgotPinRoute
   StudentLoginRoute: typeof StudentLoginRoute
   PrintRepairsRequestIdRoute: typeof PrintRepairsRequestIdRoute
@@ -437,11 +644,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebIndexRouteImport
       parentRoute: typeof WebRouteRoute
     }
+    '/_web/e-market': {
+      id: '/_web/e-market'
+      path: '/e-market'
+      fullPath: '/e-market'
+      preLoaderRoute: typeof WebEMarketRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/freshmen': {
+      id: '/_web/freshmen'
+      path: '/freshmen'
+      fullPath: '/freshmen'
+      preLoaderRoute: typeof WebFreshmenRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/knh-hub': {
+      id: '/_web/knh-hub'
+      path: '/knh-hub'
+      fullPath: '/knh-hub'
+      preLoaderRoute: typeof WebKnhHubRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
     '/_web/register': {
       id: '/_web/register'
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof WebRegisterRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/yellow-pages': {
+      id: '/_web/yellow-pages'
+      path: '/yellow-pages'
+      fullPath: '/yellow-pages'
+      preLoaderRoute: typeof WebYellowPagesRouteImport
       parentRoute: typeof WebRouteRoute
     }
     '/admin/_admin': {
@@ -470,6 +705,27 @@ declare module '@tanstack/react-router' {
       path: '/api/$'
       fullPath: '/api/$'
       preLoaderRoute: typeof ApiSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seller/_seller': {
+      id: '/seller/_seller'
+      path: '/seller'
+      fullPath: '/seller'
+      preLoaderRoute: typeof SellerSellerRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seller/login': {
+      id: '/seller/login'
+      path: '/seller/login'
+      fullPath: '/seller/login'
+      preLoaderRoute: typeof SellerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/seller/register': {
+      id: '/seller/register'
+      path: '/seller/register'
+      fullPath: '/seller/register'
+      preLoaderRoute: typeof SellerRegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/student/_student': {
@@ -521,6 +777,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrintRepairsRequestIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/seller/_seller/': {
+      id: '/seller/_seller/'
+      path: '/'
+      fullPath: '/seller/'
+      preLoaderRoute: typeof SellerSellerIndexRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
+    '/seller/_seller/account': {
+      id: '/seller/_seller/account'
+      path: '/account'
+      fullPath: '/seller/account'
+      preLoaderRoute: typeof SellerSellerAccountRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
+    '/seller/_seller/billing': {
+      id: '/seller/_seller/billing'
+      path: '/billing'
+      fullPath: '/seller/billing'
+      preLoaderRoute: typeof SellerSellerBillingRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
+    '/seller/_seller/menu': {
+      id: '/seller/_seller/menu'
+      path: '/menu'
+      fullPath: '/seller/menu'
+      preLoaderRoute: typeof SellerSellerMenuRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
+    '/seller/_seller/products': {
+      id: '/seller/_seller/products'
+      path: '/products'
+      fullPath: '/seller/products'
+      preLoaderRoute: typeof SellerSellerProductsRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
     '/student/_student/': {
       id: '/student/_student/'
       path: '/'
@@ -541,6 +832,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/student/suggestions'
       preLoaderRoute: typeof StudentStudentSuggestionsRouteImport
       parentRoute: typeof StudentStudentRouteRoute
+    }
+    '/admin/_admin/e-market/': {
+      id: '/admin/_admin/e-market/'
+      path: '/e-market'
+      fullPath: '/admin/e-market/'
+      preLoaderRoute: typeof AdminAdminEMarketIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/admin/_admin/hub/': {
+      id: '/admin/_admin/hub/'
+      path: '/hub'
+      fullPath: '/admin/hub/'
+      preLoaderRoute: typeof AdminAdminHubIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
     }
     '/admin/_admin/orders/': {
       id: '/admin/_admin/orders/'
@@ -575,6 +880,20 @@ declare module '@tanstack/react-router' {
       path: '/rooms/upload'
       fullPath: '/admin/rooms/upload'
       preLoaderRoute: typeof AdminAdminRoomsUploadRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/admin/_admin/sellers/': {
+      id: '/admin/_admin/sellers/'
+      path: '/sellers'
+      fullPath: '/admin/sellers/'
+      preLoaderRoute: typeof AdminAdminSellersIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/admin/_admin/sellers/$sellerId': {
+      id: '/admin/_admin/sellers/$sellerId'
+      path: '/sellers/$sellerId'
+      fullPath: '/admin/sellers/$sellerId'
+      preLoaderRoute: typeof AdminAdminSellersSellerIdRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
     '/admin/_admin/staff/': {
@@ -619,6 +938,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminSuggestionsIndexRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
+    '/admin/_admin/yellow-pages/': {
+      id: '/admin/_admin/yellow-pages/'
+      path: '/yellow-pages'
+      fullPath: '/admin/yellow-pages/'
+      preLoaderRoute: typeof AdminAdminYellowPagesIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
     '/student/_student/orders/': {
       id: '/student/_student/orders/'
       path: '/orders'
@@ -651,12 +977,20 @@ declare module '@tanstack/react-router' {
 }
 
 interface WebRouteRouteChildren {
+  WebEMarketRoute: typeof WebEMarketRoute
+  WebFreshmenRoute: typeof WebFreshmenRoute
+  WebKnhHubRoute: typeof WebKnhHubRoute
   WebRegisterRoute: typeof WebRegisterRoute
+  WebYellowPagesRoute: typeof WebYellowPagesRoute
   WebIndexRoute: typeof WebIndexRoute
 }
 
 const WebRouteRouteChildren: WebRouteRouteChildren = {
+  WebEMarketRoute: WebEMarketRoute,
+  WebFreshmenRoute: WebFreshmenRoute,
+  WebKnhHubRoute: WebKnhHubRoute,
   WebRegisterRoute: WebRegisterRoute,
+  WebYellowPagesRoute: WebYellowPagesRoute,
   WebIndexRoute: WebIndexRoute,
 }
 
@@ -670,15 +1004,20 @@ interface AdminAdminRouteRouteChildren {
   AdminAdminIndexRoute: typeof AdminAdminIndexRoute
   AdminAdminRepairsRequestIdRoute: typeof AdminAdminRepairsRequestIdRoute
   AdminAdminRoomsUploadRoute: typeof AdminAdminRoomsUploadRoute
+  AdminAdminSellersSellerIdRoute: typeof AdminAdminSellersSellerIdRoute
   AdminAdminStaffStaffIdRoute: typeof AdminAdminStaffStaffIdRoute
   AdminAdminStaffNewRoute: typeof AdminAdminStaffNewRoute
   AdminAdminStudentsStudentIdRoute: typeof AdminAdminStudentsStudentIdRoute
+  AdminAdminEMarketIndexRoute: typeof AdminAdminEMarketIndexRoute
+  AdminAdminHubIndexRoute: typeof AdminAdminHubIndexRoute
   AdminAdminOrdersIndexRoute: typeof AdminAdminOrdersIndexRoute
   AdminAdminRepairsIndexRoute: typeof AdminAdminRepairsIndexRoute
   AdminAdminRoomsIndexRoute: typeof AdminAdminRoomsIndexRoute
+  AdminAdminSellersIndexRoute: typeof AdminAdminSellersIndexRoute
   AdminAdminStaffIndexRoute: typeof AdminAdminStaffIndexRoute
   AdminAdminStudentsIndexRoute: typeof AdminAdminStudentsIndexRoute
   AdminAdminSuggestionsIndexRoute: typeof AdminAdminSuggestionsIndexRoute
+  AdminAdminYellowPagesIndexRoute: typeof AdminAdminYellowPagesIndexRoute
 }
 
 const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
@@ -687,20 +1026,44 @@ const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
   AdminAdminIndexRoute: AdminAdminIndexRoute,
   AdminAdminRepairsRequestIdRoute: AdminAdminRepairsRequestIdRoute,
   AdminAdminRoomsUploadRoute: AdminAdminRoomsUploadRoute,
+  AdminAdminSellersSellerIdRoute: AdminAdminSellersSellerIdRoute,
   AdminAdminStaffStaffIdRoute: AdminAdminStaffStaffIdRoute,
   AdminAdminStaffNewRoute: AdminAdminStaffNewRoute,
   AdminAdminStudentsStudentIdRoute: AdminAdminStudentsStudentIdRoute,
+  AdminAdminEMarketIndexRoute: AdminAdminEMarketIndexRoute,
+  AdminAdminHubIndexRoute: AdminAdminHubIndexRoute,
   AdminAdminOrdersIndexRoute: AdminAdminOrdersIndexRoute,
   AdminAdminRepairsIndexRoute: AdminAdminRepairsIndexRoute,
   AdminAdminRoomsIndexRoute: AdminAdminRoomsIndexRoute,
+  AdminAdminSellersIndexRoute: AdminAdminSellersIndexRoute,
   AdminAdminStaffIndexRoute: AdminAdminStaffIndexRoute,
   AdminAdminStudentsIndexRoute: AdminAdminStudentsIndexRoute,
   AdminAdminSuggestionsIndexRoute: AdminAdminSuggestionsIndexRoute,
+  AdminAdminYellowPagesIndexRoute: AdminAdminYellowPagesIndexRoute,
 }
 
 const AdminAdminRouteRouteWithChildren = AdminAdminRouteRoute._addFileChildren(
   AdminAdminRouteRouteChildren,
 )
+
+interface SellerSellerRouteRouteChildren {
+  SellerSellerAccountRoute: typeof SellerSellerAccountRoute
+  SellerSellerBillingRoute: typeof SellerSellerBillingRoute
+  SellerSellerMenuRoute: typeof SellerSellerMenuRoute
+  SellerSellerProductsRoute: typeof SellerSellerProductsRoute
+  SellerSellerIndexRoute: typeof SellerSellerIndexRoute
+}
+
+const SellerSellerRouteRouteChildren: SellerSellerRouteRouteChildren = {
+  SellerSellerAccountRoute: SellerSellerAccountRoute,
+  SellerSellerBillingRoute: SellerSellerBillingRoute,
+  SellerSellerMenuRoute: SellerSellerMenuRoute,
+  SellerSellerProductsRoute: SellerSellerProductsRoute,
+  SellerSellerIndexRoute: SellerSellerIndexRoute,
+}
+
+const SellerSellerRouteRouteWithChildren =
+  SellerSellerRouteRoute._addFileChildren(SellerSellerRouteRouteChildren)
 
 interface StudentStudentRouteRouteChildren {
   StudentStudentProfileRoute: typeof StudentStudentProfileRoute
@@ -728,10 +1091,13 @@ const StudentStudentRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   WebRouteRoute: WebRouteRouteWithChildren,
   AdminAdminRouteRoute: AdminAdminRouteRouteWithChildren,
+  SellerSellerRouteRoute: SellerSellerRouteRouteWithChildren,
   StudentStudentRouteRoute: StudentStudentRouteRouteWithChildren,
   AdminForgotPasswordRoute: AdminForgotPasswordRoute,
   AdminLoginRoute: AdminLoginRoute,
   ApiSplatRoute: ApiSplatRoute,
+  SellerLoginRoute: SellerLoginRoute,
+  SellerRegisterRoute: SellerRegisterRoute,
   StudentForgotPinRoute: StudentForgotPinRoute,
   StudentLoginRoute: StudentLoginRoute,
   PrintRepairsRequestIdRoute: PrintRepairsRequestIdRoute,

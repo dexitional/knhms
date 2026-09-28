@@ -12,10 +12,11 @@
 // and, dynamically, from session.ts's createServerFn handlers.
 import { sign, verify } from "hono/jwt";
 import { getPool  } from "@knh/db";
-import type {AdminRole} from "@knh/db";
+import type { AdminRole, SellerStatus, SellerType } from "@knh/db";
 import type { RowDataPacket } from "mysql2";
 import {
   ADMIN_SESSION_TTL_SECONDS,
+  SELLER_SESSION_TTL_SECONDS,
   STUDENT_SESSION_TTL_SECONDS,
 } from "./session.js";
 
@@ -28,6 +29,12 @@ function studentSessionSecret(): string {
 function adminSessionSecret(): string {
   const secret = process.env.ADMIN_SESSION_SECRET;
   if (!secret) throw new Error("ADMIN_SESSION_SECRET is not set.");
+  return secret;
+}
+
+function sellerSessionSecret(): string {
+  const secret = process.env.SELLER_SESSION_SECRET;
+  if (!secret) throw new Error("SELLER_SESSION_SECRET is not set.");
   return secret;
 }
 
@@ -120,5 +127,54 @@ export async function getAdminSessionUser(id: number): Promise<AdminSessionUser 
     fullName: row.full_name,
     role: row.role,
     institutionalEmail: row.institutional_email,
+  };
+}
+
+export async function signSellerToken(sellerId: number): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+  return sign(
+    { sub: sellerId, iat: now, exp: now + SELLER_SESSION_TTL_SECONDS },
+    sellerSessionSecret(),
+    "HS256",
+  );
+}
+
+export async function readSellerIdFromToken(token: string | undefined): Promise<number | null> {
+  if (!token) return null;
+  try {
+    const payload = await verify(token, sellerSessionSecret(), "HS256");
+    const id = Number(payload.sub);
+    return Number.isFinite(id) ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+// Every status can sign in (so a pending/rejected/suspended seller can see
+// why) — the seller API gates what each status may change.
+export interface SellerSessionUser {
+  id: number;
+  businessName: string;
+  ownerName: string;
+  email: string;
+  sellerType: SellerType;
+  status: SellerStatus;
+}
+
+export async function getSellerSessionUser(id: number): Promise<SellerSessionUser | null> {
+  const pool = getPool();
+  const [rows] = await pool.execute<RowDataPacket[]>(
+    "SELECT id, business_name, owner_name, email, seller_type, status FROM sellers WHERE id = ?",
+    [id],
+  );
+  const row = rows[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    businessName: row.business_name,
+    ownerName: row.owner_name,
+    email: row.email,
+    sellerType: row.seller_type,
+    status: row.status,
   };
 }

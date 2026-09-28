@@ -5,6 +5,7 @@ import type { z } from "zod";
 import { AppError } from "../../middleware/error-handler.js";
 import type { createAdminSchema, updateAdminSchema } from "./schema.js";
 import { sendSms, toE164 } from "../../lib/sms.js";
+import { generateTemporaryPassword } from "../../lib/password.js";
 
 // Never selects password_hash.
 const SELECT_COLUMNS = `
@@ -19,14 +20,6 @@ interface MysqlError extends Error {
   code?: string;
 }
 
-function generatePassword(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
-  let password = "";
-  for (let i = 0; i < 10; i++) {
-    password += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return password;
-}
 
 export async function listAdmins() {
   const pool = getPool();
@@ -111,7 +104,7 @@ export async function resetAdminPassword(id: number) {
     throw new AppError("Admin has no phone number on file.", 400);
   }
 
-  const newPassword = generatePassword();
+  const newPassword = generateTemporaryPassword();
   const passwordHash = await bcrypt.hash(newPassword, 12);
 
   await pool.execute<ResultSetHeader>(

@@ -1,5 +1,5 @@
-// Two swappable SMS gateways, both common for Ghanaian numbers — mNotify
-// (default) and smsonlinegh.com. SMS_PROVIDER selects which one is active;
+// Two swappable SMS gateways, both common for Ghanaian numbers —
+// smsonlinegh.com (default) and mNotify. SMS_PROVIDER selects which one is active;
 // switching providers is a one-line env change, no code change. Each
 // provider falls back to logging instead of sending when its own API key
 // isn't set, so PIN reset stays testable in local dev without real SMS
@@ -8,7 +8,7 @@ type SmsProvider = "mnotify" | "smsonlinegh";
 
 function activeProvider(): SmsProvider {
   const configured = process.env.SMS_PROVIDER?.toLowerCase();
-  return configured === "smsonlinegh" ? "smsonlinegh" : "mnotify";
+  return configured === "mnotify" ? "mnotify" : "smsonlinegh";
 }
 
 async function sendViaMnotify(to: string, message: string): Promise<void> {
@@ -95,6 +95,14 @@ export function toE164(countryCode: string, localNumber: string): string {
   const digitsOnly = localNumber.replace(/\D/g, "").replace(/^0+/, "");
   const code = countryCode.startsWith("+") ? countryCode : `+${countryCode}`;
   return `${code}${digitsOnly}`;
+}
+
+// For free-text phone fields (sellers) that may already include the
+// country code: "024 123 4567", "+233 24 123 4567", and
+// "+233 (0) 24 123 4567" all become "+233241234567".
+export function ghanaPhoneToE164(phone: string): string {
+  const digits = phone.replace(/\(0\)/g, "").replace(/\D/g, "");
+  return digits.startsWith("233") ? `+${digits}` : toE164("+233", digits);
 }
 
 // e.g. "+233241234567" -> "+233*******67", so the reset-request UI can

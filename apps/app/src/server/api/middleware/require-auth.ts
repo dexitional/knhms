@@ -1,22 +1,23 @@
 import type { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import type { AdminRole } from "@knh/db";
-import { ADMIN_SESSION_COOKIE, STUDENT_SESSION_COOKIE } from "#/server/session";
+import { ADMIN_SESSION_COOKIE, SELLER_SESSION_COOKIE, STUDENT_SESSION_COOKIE } from "#/server/session";
 import {
   getAdminSessionUser,
+  getSellerSessionUser,
   getStudentSessionUser,
   readAdminIdFromToken,
-  readStudentIdFromToken
-  
-  
+  readSellerIdFromToken,
+  readStudentIdFromToken,
 } from "#/server/session-core";
-import type {AdminSessionUser, StudentSessionUser} from "#/server/session-core";
+import type { AdminSessionUser, SellerSessionUser, StudentSessionUser } from "#/server/session-core";
 import { AppError } from "./error-handler.js";
 
 declare module "hono" {
   interface ContextVariableMap {
     student: StudentSessionUser;
     admin: AdminSessionUser;
+    seller: SellerSessionUser;
   }
 }
 
@@ -27,6 +28,16 @@ export async function requireStudent(c: Context, next: Next) {
   const student = await getStudentSessionUser(id);
   if (!student) throw new AppError("Not authenticated.", 401);
   c.set("student", student);
+  await next();
+}
+
+export async function requireSeller(c: Context, next: Next) {
+  const token = getCookie(c, SELLER_SESSION_COOKIE);
+  const id = await readSellerIdFromToken(token);
+  if (!id) throw new AppError("Not authenticated.", 401);
+  const seller = await getSellerSessionUser(id);
+  if (!seller) throw new AppError("Not authenticated.", 401);
+  c.set("seller", seller);
   await next();
 }
 

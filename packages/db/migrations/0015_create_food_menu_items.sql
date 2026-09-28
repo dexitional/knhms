@@ -1,0 +1,16 @@
+CREATE TABLE IF NOT EXISTS food_menu_items (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  vendor_id INT UNSIGNED NOT NULL,
+  section VARCHAR(60) NOT NULL DEFAULT 'Menu',
+  name VARCHAR(150) NOT NULL,
+  description VARCHAR(500) NULL,
+  price DECIMAL(10, 2) NOT NULL,
+  image_url VARCHAR(500) NULL,
+  is_available TINYINT(1) NOT NULL DEFAULT 1,
+  sort_order INT NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_food_menu_items_vendor (vendor_id, sort_order),
+  CONSTRAINT fk_food_menu_items_vendor FOREIGN KEY (vendor_id) REFERENCES food_vendors (id) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

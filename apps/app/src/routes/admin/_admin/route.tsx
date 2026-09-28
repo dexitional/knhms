@@ -1,12 +1,16 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import {
+  BadgeCheck,
+  BookUser,
   DoorOpen,
   KeyRound,
   LayoutDashboard,
   LogOut,
   MessageSquareHeart,
+  Newspaper,
   ShieldCheck,
   ShoppingBag,
+  Store,
   Users,
   Wrench,
 } from "lucide-react";
@@ -32,6 +36,10 @@ const navItems = [
   { to: "/admin/repairs", label: "Repairs", icon: Wrench },
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag },
   { to: "/admin/suggestions", label: "Suggestions", icon: MessageSquareHeart },
+  { to: "/admin/hub", label: "KNH Hub", icon: Newspaper },
+  { to: "/admin/yellow-pages", label: "Yellow Pages", icon: BookUser },
+  { to: "/admin/e-market", label: "E-Market", icon: Store },
+  { to: "/admin/sellers", label: "Sellers", icon: BadgeCheck },
   { to: "/admin/staff", label: "Staff", icon: ShieldCheck },
 ] as const;
 

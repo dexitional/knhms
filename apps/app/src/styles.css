@@ -4,6 +4,7 @@
    dropped (no network request even fires), not a build error. */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Roboto:wght@400;500;700&family=Noto+Sans:wght@400;500;600;700&family=Caveat:wght@400..700&display=swap");
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* GOTCHA: Tailwind v4's automatic content scanner only walks this app's own
    src/ tree — it never looks inside the sibling @knh/ui workspace package.
@@ -19,6 +20,16 @@ html,
 body,
 #app {
   min-height: 100%;
+}
+
+/* Tailwind v4's preflight resets buttons to the default arrow cursor;
+   restore the pointer so clickable titles, cards, and controls read as
+   clickable. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 /* Reusable glassmorphism surface for cards across the public site and both

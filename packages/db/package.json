@@ -9,6 +9,10 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:seed": "tsx scripts/seed-admin.ts",
     "db:import-rooms": "tsx scripts/import-rooms-xlsx.ts",
+    "db:seed-directory": "tsx scripts/seed-directory.ts",
+    "db:seed-market": "tsx scripts/seed-market.ts",
+    "db:seed-food": "tsx scripts/seed-food.ts",
+    "db:seed-hub": "tsx scripts/seed-hub.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

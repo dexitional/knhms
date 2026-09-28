@@ -6,7 +6,7 @@ import { api } from "#/lib/api-client";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 
-type UploadFolder = "student-photos" | "receipts" | "admin-photos";
+export type UploadFolder = "student-photos" | "receipts" | "admin-photos" | "directory-photos" | "market-images" | "hub-images";
 
 interface PresignResponse {
   uploadUrl: string;
@@ -16,8 +16,28 @@ interface PresignResponse {
 const ACCEPT_BY_FOLDER: Record<UploadFolder, string> = {
   "student-photos": "image/jpeg,image/png,image/webp",
   "admin-photos": "image/jpeg,image/png,image/webp",
+  "directory-photos": "image/jpeg,image/png,image/webp",
+  "market-images": "image/jpeg,image/png,image/webp",
+  "hub-images": "image/jpeg,image/png,image/webp",
   receipts: "image/jpeg,image/png,image/webp,application/pdf",
 };
+
+// Presigned direct-to-storage upload; returns the file's public URL.
+export async function uploadFile(file: File, folder: UploadFolder): Promise<string> {
+  if (file.size > MAX_BYTES) throw new Error("File must be under 8MB.");
+  const { uploadUrl, publicUrl } = await api.post<PresignResponse>("/uploads/presign", {
+    filename: file.name,
+    contentType: file.type,
+    folder,
+  });
+  const putRes = await fetch(uploadUrl, {
+    method: "PUT",
+    headers: { "Content-Type": file.type },
+    body: file,
+  });
+  if (!putRes.ok) throw new Error("Upload failed");
+  return publicUrl;
+}
 
 export function FileUploadField({
   label,
@@ -44,18 +64,7 @@ export function FileUploadField({
 
     setUploading(true);
     try {
-      const { uploadUrl, publicUrl } = await api.post<PresignResponse>("/uploads/presign", {
-        filename: file.name,
-        contentType: file.type,
-        folder,
-      });
-      const putRes = await fetch(uploadUrl, {
-        method: "PUT",
-        headers: { "Content-Type": file.type },
-        body: file,
-      });
-      if (!putRes.ok) throw new Error("Upload failed");
-      onChange(publicUrl);
+      onChange(await uploadFile(file, folder));
     } catch {
       toast.error("Couldn't upload the file — please try again.");
     } finally {
