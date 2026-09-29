@@ -53,7 +53,7 @@ interface AdminRow {
 
 const adminSchema = z.object({
   fullName: z.string().min(2, "Required").max(150),
-  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"]),
+  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor", "manager"]),
   position: z.string().max(100).optional(),
   phoneNumber: z.string().max(20).optional(),
   isActive: z.boolean(),
@@ -111,7 +111,7 @@ function StaffPage() {
     setEditingAdmin(a)
     editForm.reset({
       fullName: a.full_name,
-      role: a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor",
+      role: a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor" | "manager",
       position: a.position ?? "",
       phoneNumber: a.phone_number ?? "",
       isActive: a.is_active === 1,
@@ -185,7 +185,7 @@ function StaffPage() {
                   </TableCell>
                   <TableCell>{a.staff_number}</TableCell>
                   <TableCell>
-                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor"} />
+                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor" | "manager"} />
                   </TableCell>
                   <TableCell>{a.position ?? <TableEmptyValue />}</TableCell>
                   <TableCell>{a.phone_number ?? <TableEmptyValue />}</TableCell>
@@ -281,6 +281,7 @@ function StaffPage() {
                         <SelectItem value="stores">Stores</SelectItem>
                         <SelectItem value="supervisor">Supervisor</SelectItem>
                         <SelectItem value="editor">Editor</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

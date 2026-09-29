@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const adminRoleSchema = z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"]);
+export const adminRoleSchema = z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor", "manager"]);
 
 export const createAdminSchema = z.object({
   fullName: z.string().min(2).max(150),

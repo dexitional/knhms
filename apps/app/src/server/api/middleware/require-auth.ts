@@ -56,7 +56,7 @@ export function requireAdminRole(allowed: AdminRole[]) {
   };
 }
 
-export const ANY_ADMIN: AdminRole[] = ["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"];
+export const ANY_ADMIN: AdminRole[] = ["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor", "manager"];
 export const ADMIN_ONLY: AdminRole[] = ["super_admin", "admin"];
 export const SUPER_ADMIN_ONLY: AdminRole[] = ["super_admin"];
 

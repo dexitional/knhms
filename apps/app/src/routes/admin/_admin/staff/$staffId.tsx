@@ -128,6 +128,7 @@ function StaffDetailPage() {
                         <SelectItem value="stores">Stores</SelectItem>
                         <SelectItem value="supervisor">Supervisor</SelectItem>
                         <SelectItem value="editor">Editor</SelectItem>
+                        <SelectItem value="manager">Manager</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                       </SelectContent>
