@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { ArrowLeft, Upload } from "lucide-react";
 import { Button } from "#/components/ui/button.tsx";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.tsx";
+import { canManage } from "#/lib/permissions";
 
 export const Route = createFileRoute("/admin/_admin/rooms/upload")({
   component: BulkUploadPage,
@@ -22,6 +23,7 @@ interface UploadResult {
 }
 
 function BulkUploadPage() {
+  const { admin } = Route.useRouteContext();
   const queryClient = useQueryClient();
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -53,6 +55,10 @@ function BulkUploadPage() {
       if (inputRef.current) inputRef.current.value = "";
     }
   };
+
+  if (!canManage(admin.role, "rooms")) {
+    return <p className="text-muted-foreground">You don't have permission to upload rooms.</p>;
+  }
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6">

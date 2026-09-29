@@ -39,6 +39,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select.tsx"
+import { canManage } from "#/lib/permissions"
+import { ClicksCell, MarketActivity, ViewsCell, clicksOf, statsFor } from "#/components/admin/market-analytics"
+import type { StatsRange } from "#/components/admin/market-analytics"
+import type { MarketAnalytics } from "#/lib/market"
+import { Pagination } from "#/components/pagination"
 
 export const Route = createFileRoute("/admin/_admin/e-market/")({
   component: EMarketAdminPage,
@@ -84,7 +89,7 @@ const errorMessage = (fallback: string) => (err: unknown) =>
 
 function EMarketAdminPage() {
   const { admin } = Route.useRouteContext()
-  const canEdit = admin.role === "super_admin" || admin.role === "admin"
+  const canEdit = canManage(admin.role, "market")
   const [tab, setTab] = useState<(typeof TABS)[number][0]>("products")
 
   const categoriesQuery = useQuery({
@@ -92,6 +97,11 @@ function EMarketAdminPage() {
     queryFn: () => api.get<{ categories: Array<CategoryRow> }>("/market/categories"),
   })
   const categories = categoriesQuery.data?.categories ?? []
+  const [days, setDays] = useState<StatsRange>(30)
+  const analyticsQuery = useQuery({
+    queryKey: ["market", "analytics", days],
+    queryFn: () => api.get<MarketAnalytics>("/analytics/market", { days }),
+  })
 
   return (
     <div className="flex flex-col gap-6">
@@ -112,6 +122,8 @@ function EMarketAdminPage() {
         </a>
       </div>
 
+      <MarketActivity days={days} onDaysChange={setDays} data={analyticsQuery.data} />
+
       <div className="flex w-fit gap-1 rounded-lg bg-secondary p-1" role="tablist">
         {TABS.map(([t, label]) => (
           <button
@@ -130,11 +142,13 @@ function EMarketAdminPage() {
         ))}
       </div>
 
-      {tab === "products" && <ProductsTab canEdit={canEdit} categories={categories} />}
+      {tab === "products" && (
+        <ProductsTab canEdit={canEdit} categories={categories} analytics={analyticsQuery.data} />
+      )}
       {tab === "categories" && (
         <CategoriesTab canEdit={canEdit} categories={categories} isLoading={categoriesQuery.isLoading} />
       )}
-      {tab === "vendors" && <FoodVendorsTab canEdit={canEdit} />}
+      {tab === "vendors" && <FoodVendorsTab canEdit={canEdit} analytics={analyticsQuery.data} />}
     </div>
   )
 }
@@ -215,10 +229,24 @@ function toProductBody(v: ProductFormValues) {
   }
 }
 
-function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Array<CategoryRow> }) {
+const PRODUCTS_PAGE_SIZE = 15
+
+type ProductSort = "default" | "views" | "clicks"
+
+function ProductsTab({
+  canEdit,
+  categories,
+  analytics,
+}: {
+  canEdit: boolean
+  categories: Array<CategoryRow>
+  analytics: MarketAnalytics | undefined
+}) {
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [categoryFilter, setCategoryFilter] = useState("all")
+  const [sort, setSort] = useState<ProductSort>("default")
+  const [page, setPage] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<ProductRow | null>(null)
 
@@ -283,11 +311,44 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
       (categoryFilter === "all" || p.category_id === Number(categoryFilter)) &&
       (!query || [p.name, p.seller_name].some((f) => f.toLowerCase().includes(query))),
   )
+  if (sort !== "default") {
+    const score = (id: number) => {
+      const s = statsFor(analytics?.products, id)
+      return sort === "views" ? s.views : clicksOf(s)
+    }
+    products.sort((a, b) => score(b.id) - score(a.id))
+  }
+  const maxViews = Math.max(0, ...products.map((p) => statsFor(analytics?.products, p.id).views))
+  // Stay on a real page when filtering or deleting shrinks the list.
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(products.length / PRODUCTS_PAGE_SIZE)))
+  const pageItems = products.slice((currentPage - 1) * PRODUCTS_PAGE_SIZE, currentPage * PRODUCTS_PAGE_SIZE)
 
   return (
     <>
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+        <Select
+          value={sort}
+          onValueChange={(v) => {
+            setSort(v as ProductSort)
+            setPage(1)
+          }}
+        >
+          <SelectTrigger className="w-44" aria-label="Sort products">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="default">Default order</SelectItem>
+            <SelectItem value="views">Most viewed</SelectItem>
+            <SelectItem value="clicks">Most order clicks</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select
+          value={categoryFilter}
+          onValueChange={(v) => {
+            setCategoryFilter(v)
+            setPage(1)
+          }}
+        >
           <SelectTrigger className="w-52">
             <SelectValue />
           </SelectTrigger>
@@ -302,7 +363,15 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
         </Select>
         <div className="relative w-48">
           <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-8" />
+          <Input
+            placeholder="Search..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(1)
+            }}
+            className="pl-8"
+          />
         </div>
         {canEdit && (
           <Button onClick={openCreate} disabled={categories.length === 0} title={categories.length === 0 ? "Add a category first" : undefined}>
@@ -314,7 +383,7 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
-        <Table className="min-w-[960px]">
+        <Table className="min-w-[1120px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead>Product</TableHead>
@@ -322,6 +391,8 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
               <TableHead>Price</TableHead>
               <TableHead>For</TableHead>
               <TableHead>Seller</TableHead>
+              <TableHead title={`Last ${analytics?.range.days ?? 30} days`}>Views</TableHead>
+              <TableHead title={`Last ${analytics?.range.days ?? 30} days; % of views`}>Order clicks</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right" />
             </TableRow>
@@ -329,12 +400,12 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
           <TableBody>
             {!isLoading && products.length === 0 && (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
                   No products found.
                 </TableCell>
               </TableRow>
             )}
-            {products.map((p) => {
+            {pageItems.map((p) => {
               const pct = discountPercent(p.price, p.old_price)
               const Icon = marketIcon(categories.find((c) => c.id === p.category_id)?.icon ?? "")
               return (
@@ -349,7 +420,7 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
                         </div>
                       )}
                       <div className="min-w-0">
-                        <p className="max-w-64 truncate font-medium text-foreground">{p.name}</p>
+                        <p className="max-w-80 min-w-48 font-medium break-words text-foreground">{p.name}</p>
                         <p className="text-xs text-muted-foreground capitalize">{p.item_condition}</p>
                       </div>
                     </div>
@@ -365,6 +436,12 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
                   </TableCell>
                   <TableCell>{AUDIENCE_LABELS[p.audience]}</TableCell>
                   <TableCell className="max-w-44 truncate">{p.seller_name}</TableCell>
+                  <TableCell>
+                    <ViewsCell stats={statsFor(analytics?.products, p.id)} max={maxViews} />
+                  </TableCell>
+                  <TableCell>
+                    <ClicksCell stats={statsFor(analytics?.products, p.id)} />
+                  </TableCell>
                   <TableCell>
                     <div className="flex flex-wrap gap-1">
                       <Badge variant={p.is_active ? "success" : "danger"}>{p.is_active ? "Visible" : "Hidden"}</Badge>
@@ -415,6 +492,9 @@ function ProductsTab({ canEdit, categories }: { canEdit: boolean; categories: Ar
             })}
           </TableBody>
         </Table>
+        {products.length > PRODUCTS_PAGE_SIZE && (
+          <Pagination page={currentPage} pageSize={PRODUCTS_PAGE_SIZE} total={products.length} onPageChange={setPage} />
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

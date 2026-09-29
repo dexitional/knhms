@@ -17,6 +17,7 @@ import {
 } from "#/components/ui/select.tsx";
 import { StatusBadge } from "#/components/status-badge";
 import { RoomNumberBadge } from "#/components/room-number-badge";
+import { canManage } from "#/lib/permissions";
 
 export const Route = createFileRoute("/admin/_admin/repairs/$requestId")({
   component: RepairDetailPage,
@@ -50,6 +51,8 @@ interface UpdateValues {
 
 function RepairDetailPage() {
   const { requestId } = Route.useParams();
+  const { admin } = Route.useRouteContext();
+  const canEdit = canManage(admin.role, "repairs");
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
@@ -59,6 +62,7 @@ function RepairDetailPage() {
   const { data: adminsData } = useQuery({
     queryKey: ["admins"],
     queryFn: () => api.get<{ admins: AdminOption[] }>("/admins"),
+    enabled: canEdit,
   });
 
   const { handleSubmit, control, register } = useForm<UpdateValues>({
@@ -130,6 +134,29 @@ function RepairDetailPage() {
         </CardContent>
       </Card>
 
+      {!canEdit ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Progress</CardTitle>
+          </CardHeader>
+          <CardContent className="grid gap-3 text-sm sm:grid-cols-2">
+            <div>
+              <p className="text-muted-foreground">Status</p>
+              <p className="font-medium capitalize">{r.status}</p>
+            </div>
+            <div>
+              <p className="text-muted-foreground">Assigned to</p>
+              <p className="font-medium">{r.assigned_admin_name ?? "Unassigned"}</p>
+            </div>
+            {r.admin_remarks && (
+              <div className="sm:col-span-2">
+                <p className="text-muted-foreground">Admin remarks</p>
+                <p className="font-medium">{r.admin_remarks}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
       <Card>
         <CardHeader>
           <CardTitle>Manage Request</CardTitle>
@@ -194,6 +221,7 @@ function RepairDetailPage() {
           </form>
         </CardContent>
       </Card>
+      )}
     </div>
   );
 }

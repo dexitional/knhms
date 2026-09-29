@@ -8,9 +8,19 @@ import {
   readAdminIdFromToken,
   readSellerIdFromToken,
 } from "#/server/session-core";
+import { canManage } from "#/lib/permissions";
+import type { AdminModule } from "#/lib/permissions";
 import { AppError } from "../../middleware/error-handler.js";
 import { presignSchema } from "./schema.js";
 import * as service from "./service.js";
+
+// Which admin permission each upload folder needs (any one of the modules).
+const FOLDER_MODULES: Record<string, Array<AdminModule>> = {
+  "admin-photos": ["users"],
+  "directory-photos": ["yellowPages"],
+  "hub-images": ["hub", "freshmen"],
+  "market-images": ["market"],
+};
 
 // Unlike every other admin-owned module, this endpoint must be reachable
 // pre-authentication for "student-photos"/"receipts": a registrant uploads
@@ -34,6 +44,10 @@ export const uploadsRoute = new Hono().post(
           : null;
       const seller = sellerId ? await getSellerSessionUser(sellerId) : null;
       if (!admin && !seller) throw new AppError("Not authenticated.", 401);
+      if (admin && !seller) {
+        const modules = FOLDER_MODULES[input.folder] ?? [];
+        if (!modules.some((m) => canManage(admin.role, m))) throw new AppError("Forbidden.", 403);
+      }
     }
 
     const result = await service.presignUpload(input);

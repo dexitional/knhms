@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
+import { requireAdminRole, requirePermission, requireStudent } from "../../middleware/require-auth.js";
+import { STUDENT_EDITORS } from "#/lib/permissions";
 import { listStudentsQuerySchema, updateOwnProfileSchema, updateStudentSchema } from "./schema.js";
 import * as service from "./service.js";
 
@@ -16,24 +17,30 @@ export const studentsRoute = new Hono()
     return c.json({ student });
   })
 
-  .get("/", requireAdminRole(ANY_ADMIN), zValidator("query", listStudentsQuerySchema), async (c) => {
+  .get("/", requirePermission("students", "view"), zValidator("query", listStudentsQuerySchema), async (c) => {
     const result = await service.listStudents(c.req.valid("query"));
     return c.json(result);
   })
-  .get("/:id", requireAdminRole(ANY_ADMIN), async (c) => {
+  .get("/room-options", requireAdminRole(STUDENT_EDITORS), async (c) =>
+    c.json({ rooms: await service.listRoomOptions() }),
+  )
+  .post("/:id/reset-pin", requirePermission("students", "manage"), async (c) =>
+    c.json(await service.resetStudentPin(Number(c.req.param("id")))),
+  )
+  .get("/:id", requirePermission("students", "view"), async (c) => {
     const student = await service.getStudent(Number(c.req.param("id")));
     return c.json({ student });
   })
   .patch(
     "/:id",
-    requireAdminRole(ANY_ADMIN),
+    requireAdminRole(STUDENT_EDITORS),
     zValidator("json", updateStudentSchema),
     async (c) => {
       const student = await service.updateStudent(Number(c.req.param("id")), c.req.valid("json"));
       return c.json({ student });
     },
   )
-  .delete("/:id", requireAdminRole(ANY_ADMIN), async (c) => {
+  .delete("/:id", requirePermission("students", "manage"), async (c) => {
     await service.deleteStudent(Number(c.req.param("id")));
     return c.body(null, 204);
   });

@@ -6,6 +6,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { ListOrdered, Pencil, Plus, Trash2, UtensilsCrossed } from "lucide-react"
 import { api, ApiError } from "#/lib/api-client"
+import type { MarketAnalytics } from "#/lib/market"
+import { ClicksCell, ViewsCell, statsFor } from "#/components/admin/market-analytics"
 import { FileUploadField } from "#/components/file-upload-field"
 import { FormField } from "#/components/form-field"
 import { MenuManager } from "#/components/menu-manager"
@@ -52,7 +54,7 @@ const QUERY_KEY = ["food", "vendors"]
 const errorMessage = (fallback: string) => (err: unknown) =>
   toast.error(err instanceof ApiError ? err.message : fallback)
 
-export function FoodVendorsTab({ canEdit }: { canEdit: boolean }) {
+export function FoodVendorsTab({ canEdit, analytics }: { canEdit: boolean; analytics?: MarketAnalytics }) {
   const queryClient = useQueryClient()
   const [vendorDialog, setVendorDialog] = useState<{ open: boolean; editing: Vendor | null }>({
     open: false,
@@ -66,6 +68,7 @@ export function FoodVendorsTab({ canEdit }: { canEdit: boolean }) {
   })
   const vendors = data?.vendors ?? []
   const menuVendor = vendors.find((v) => v.id === menuVendorId) ?? null
+  const maxViews = Math.max(0, ...vendors.map((v) => statsFor(analytics?.vendors, v.id).views))
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: QUERY_KEY })
 
@@ -97,12 +100,14 @@ export function FoodVendorsTab({ canEdit }: { canEdit: boolean }) {
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
-        <Table className="min-w-[880px]">
+        <Table className="min-w-[1040px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead>Vendor</TableHead>
               <TableHead>Location</TableHead>
               <TableHead>Menu</TableHead>
+              <TableHead title={`Menu views, last ${analytics?.range.days ?? 30} days`}>Views</TableHead>
+              <TableHead title={`Last ${analytics?.range.days ?? 30} days; % of views`}>Order clicks</TableHead>
               <TableHead>Now</TableHead>
               <TableHead>Status</TableHead>
               <TableHead className="text-right" />
@@ -111,7 +116,7 @@ export function FoodVendorsTab({ canEdit }: { canEdit: boolean }) {
           <TableBody>
             {!isLoading && vendors.length === 0 && (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">
                   No food vendors yet.
                 </TableCell>
               </TableRow>
@@ -139,6 +144,12 @@ export function FoodVendorsTab({ canEdit }: { canEdit: boolean }) {
                     <ListOrdered className="size-4" />
                     {v.menu.length} item{v.menu.length === 1 ? "" : "s"}
                   </Button>
+                </TableCell>
+                <TableCell>
+                  <ViewsCell stats={statsFor(analytics?.vendors, v.id)} max={maxViews} />
+                </TableCell>
+                <TableCell>
+                  <ClicksCell stats={statsFor(analytics?.vendors, v.id)} />
                 </TableCell>
                 <TableCell>
                   <button

@@ -9,6 +9,7 @@ import { Card, CardContent } from "#/components/ui/card.tsx"
 import { Button } from "#/components/ui/button.tsx"
 import { StatusBadge } from "#/components/status-badge"
 import { Pagination } from "#/components/pagination"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/suggestions/")({
   component: AdminSuggestionsPage,
@@ -28,6 +29,8 @@ interface SuggestionRow {
 const PAGE_SIZE = 20
 
 function AdminSuggestionsPage() {
+  const { admin } = Route.useRouteContext()
+  const canEdit = canManage(admin.role, "suggestions")
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const queryClient = useQueryClient()
@@ -83,7 +86,7 @@ function AdminSuggestionsPage() {
               </div>
               <div className="flex flex-col items-end gap-2">
                 <StatusBadge status={s.status} />
-                {s.status === "new" && (
+                {canEdit && s.status === "new" && (
                   <Button size="sm" variant="outline" onClick={() => reviewMutation.mutate(s.id)}>
                     Mark Reviewed
                   </Button>

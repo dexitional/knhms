@@ -1,7 +1,7 @@
 import { useState } from "react"
 
 interface RoleBadgeProps {
-  role: "super_admin" | "admin" | "staff" | "tutor" | "technician"
+  role: "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor"
   className?: string
 }
 
@@ -26,6 +26,9 @@ export function RoleBadge({ role, className = "" }: RoleBadgeProps) {
     staff: "Staff",
     tutor: "Tutor",
     technician: "Technician",
+    stores: "Stores",
+    supervisor: "Supervisor",
+    editor: "Editor",
   }
 
   return (

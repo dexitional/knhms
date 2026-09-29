@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS inventory_requests (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  requested_by INT UNSIGNED NULL,
+  purpose VARCHAR(500) NOT NULL,
+  status ENUM('pending', 'approved', 'rejected', 'released', 'cancelled') NOT NULL DEFAULT 'pending',
+  decision_note VARCHAR(500) NULL,
+  approved_by INT UNSIGNED NULL,
+  approved_at DATETIME NULL,
+  rejected_by INT UNSIGNED NULL,
+  rejected_at DATETIME NULL,
+  released_by INT UNSIGNED NULL,
+  released_at DATETIME NULL,
+  cancelled_at DATETIME NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_inventory_requests_status (status, created_at),
+  CONSTRAINT fk_inventory_requests_requested_by FOREIGN KEY (requested_by) REFERENCES admins (id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_inventory_requests_approved_by FOREIGN KEY (approved_by) REFERENCES admins (id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_inventory_requests_rejected_by FOREIGN KEY (rejected_by) REFERENCES admins (id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_inventory_requests_released_by FOREIGN KEY (released_by) REFERENCES admins (id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

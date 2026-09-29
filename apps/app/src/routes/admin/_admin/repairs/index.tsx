@@ -26,6 +26,7 @@ import {
 import { Pagination } from "#/components/pagination"
 import { RoomNumberBadge } from "#/components/room-number-badge"
 import { Pencil } from "lucide-react"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/repairs/")({
   component: AdminRepairsPage,
@@ -74,7 +75,7 @@ function AdminRepairsPage() {
     onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't update status."),
   })
 
-  const canEdit = currentAdmin.role === "super_admin" || currentAdmin.role === "admin"
+  const canEdit = canManage(currentAdmin.role, "repairs")
 
   return (
     <div className="flex flex-col gap-6">

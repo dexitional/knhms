@@ -17,6 +17,9 @@ export const updateSellerStatusSchema = z
   .object({
     status: z.enum(["approved", "rejected", "suspended"]),
     reason: z.string().trim().max(500).optional(),
+    // Optional fee waivers, set together with an approval.
+    registrationFeeWaived: z.boolean().optional(),
+    monthlyFeeWaived: z.boolean().optional(),
   })
   .refine((v) => v.status === "approved" || (v.reason && v.reason.length >= 3), {
     message: "Give the seller a reason.",
@@ -36,3 +39,10 @@ export const recordPaymentSchema = z
     message: "How many months does this payment cover?",
     path: ["months"],
   });
+
+export const updateFeeWaiversSchema = z
+  .object({
+    registrationFeeWaived: z.boolean(),
+    monthlyFeeWaived: z.boolean(),
+  })
+  .partial();

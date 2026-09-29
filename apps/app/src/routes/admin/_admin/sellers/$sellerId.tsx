@@ -12,12 +12,14 @@ import { METHOD_LABELS, SELLER_TYPE_LABELS, STATUS_BADGE, STATUS_LABELS, formatD
 import type { BillingSummary, Seller, SellerPayment } from "#/lib/sellers"
 import { FormField } from "#/components/form-field"
 import { BillingSummaryCard, PaymentHistoryTable } from "#/components/seller-billing"
+import { SellerLogo } from "#/components/seller-logo"
 import { Badge } from "#/components/ui/badge.tsx"
 import { Button } from "#/components/ui/button.tsx"
 import { Input } from "#/components/ui/input.tsx"
 import { Textarea } from "#/components/ui/textarea.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/sellers/$sellerId")({
   component: SellerDetailPage,
@@ -38,7 +40,7 @@ const errorMessage = (fallback: string) => (err: unknown) =>
 function SellerDetailPage() {
   const { sellerId } = Route.useParams()
   const { admin } = Route.useRouteContext()
-  const canEdit = admin.role === "super_admin" || admin.role === "admin"
+  const canEdit = canManage(admin.role, "sellers")
   const queryClient = useQueryClient()
   const [statusDialog, setStatusDialog] = useState<StatusAction | null>(null)
   const [paymentOpen, setPaymentOpen] = useState(false)
@@ -76,12 +78,15 @@ function SellerDetailPage() {
       </Button>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{seller.business_name}</h1>
-          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <Badge variant={STATUS_BADGE[seller.status]}>{STATUS_LABELS[seller.status]}</Badge>
-            <span>{SELLER_TYPE_LABELS[seller.seller_type]}</span>
-            <span>· Applied {formatDate(seller.created_at)}</span>
+        <div className="flex items-center gap-4">
+          <SellerLogo logoUrl={seller.logo_url} name={seller.business_name} className="size-16 text-lg" />
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">{seller.business_name}</h1>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <Badge variant={STATUS_BADGE[seller.status]}>{STATUS_LABELS[seller.status]}</Badge>
+              <span>{SELLER_TYPE_LABELS[seller.seller_type]}</span>
+              <span>· Applied {formatDate(seller.created_at)}</span>
+            </div>
           </div>
         </div>
         {canEdit && (
@@ -162,9 +167,14 @@ function SellerDetailPage() {
         <div className="flex flex-col gap-4 lg:col-span-2">
           <BillingSummaryCard billing={billing} />
           {canEdit && seller.status !== "rejected" && (
-            <Button className="w-fit" onClick={() => setPaymentOpen(true)}>
-              <Plus className="size-4" /> Record payment
-            </Button>
+            <>
+              <FeeWaivers seller={seller} onDone={onDetail} />
+              {!(billing.registrationPaid && billing.monthlyWaived) && (
+                <Button className="w-fit" onClick={() => setPaymentOpen(true)}>
+                  <Plus className="size-4" /> Record payment
+                </Button>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -218,12 +228,17 @@ function StatusDialog({
   onDone: (detail: SellerDetail) => void
 }) {
   const [reason, setReason] = useState("")
+  const [waiveRegistration, setWaiveRegistration] = useState(seller.registration_fee_waived === 1)
+  const [waiveMonthly, setWaiveMonthly] = useState(seller.monthly_fee_waived === 1)
   const copy = ACTION_COPY[action]
+  // Waivers are offered when approving a new (or previously rejected) seller.
+  const offersWaivers = action === "approved" && seller.status !== "suspended"
   const mutation = useMutation({
     mutationFn: () =>
       api.post<SellerDetail>(`/sellers/${seller.id}/status`, {
         status: action,
         reason: copy.needsReason ? reason : undefined,
+        ...(offersWaivers && { registrationFeeWaived: waiveRegistration, monthlyFeeWaived: waiveMonthly }),
       }),
     onSuccess: (detail) => {
       toast.success(`${seller.business_name} ${action === "approved" ? "approved" : action}.`)
@@ -235,7 +250,7 @@ function StatusDialog({
   const approveBody =
     seller.status === "suspended"
       ? "Their listings will be visible on the E-Market again."
-      : "Their listings will go live on the E-Market, and monthly billing starts today."
+      : `Their listings will go live on the E-Market${waiveMonthly ? "." : ", and monthly billing starts today."}`
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -259,6 +274,19 @@ function StatusDialog({
             </FormField>
           ) : (
             <p className="text-sm text-muted-foreground">{approveBody} The seller will get an SMS.</p>
+          )}
+          {offersWaivers && (
+            <fieldset className="flex flex-col gap-2 rounded-lg border border-border p-3">
+              <legend className="px-1 text-sm font-medium">Fee waivers (optional)</legend>
+              <WaiverCheckbox
+                label="Waive registration fee"
+                checked={waiveRegistration}
+                disabled={seller.registration_paid_at != null}
+                hint={seller.registration_paid_at != null ? "Already paid" : undefined}
+                onChange={setWaiveRegistration}
+              />
+              <WaiverCheckbox label="Waive monthly fee" checked={waiveMonthly} onChange={setWaiveMonthly} />
+            </fieldset>
           )}
           {action === "suspended" && (
             <p className="text-sm text-muted-foreground">Their listings will be hidden from the E-Market.</p>
@@ -301,6 +329,7 @@ function PaymentDialog({
   onDone: (detail: SellerDetail) => void
 }) {
   const registrationDue = !billing.registrationPaid
+  const monthlyBillable = !billing.monthlyWaived
   const form = useForm<PaymentInput, unknown, PaymentValues>({
     resolver: zodResolver(paymentSchema),
     defaultValues: {
@@ -357,9 +386,11 @@ function PaymentDialog({
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="registration" disabled={!registrationDue}>
-                        Registration fee{registrationDue ? "" : " (paid)"}
+                        Registration fee{registrationDue ? "" : billing.registrationWaived ? " (waived)" : " (paid)"}
                       </SelectItem>
-                      <SelectItem value="monthly">Monthly fee</SelectItem>
+                      <SelectItem value="monthly" disabled={!monthlyBillable}>
+                        Monthly fee{monthlyBillable ? "" : " (waived)"}
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 )}
@@ -421,5 +452,71 @@ function PaymentDialog({
         </form>
       </DialogContent>
     </Dialog>
+  )
+}
+
+function WaiverCheckbox({
+  label,
+  checked,
+  disabled = false,
+  hint,
+  onChange,
+}: {
+  label: string
+  checked: boolean
+  disabled?: boolean
+  hint?: string
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <label className="flex cursor-pointer items-center gap-2 text-sm font-medium has-disabled:cursor-not-allowed has-disabled:opacity-60">
+      <input
+        type="checkbox"
+        className="h-4 w-4 rounded border-input"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {label}
+      {hint && <span className="text-xs font-normal text-muted-foreground">({hint})</span>}
+    </label>
+  )
+}
+
+// Per-seller fee waivers; each change saves immediately.
+function FeeWaivers({ seller, onDone }: { seller: Seller; onDone: (detail: SellerDetail) => void }) {
+  const registrationPaid = seller.registration_paid_at != null
+  const mutation = useMutation({
+    mutationFn: (body: { registrationFeeWaived?: boolean; monthlyFeeWaived?: boolean }) =>
+      api.put<SellerDetail>(`/sellers/${seller.id}/waivers`, body),
+    onSuccess: (detail) => {
+      toast.success("Fee waivers updated.")
+      onDone(detail)
+    },
+    onError: errorMessage("Couldn't update the fee waivers."),
+  })
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <h2 className="font-semibold text-foreground">Fee waivers</h2>
+      <p className="text-sm text-muted-foreground">
+        Optional. A waived fee isn't charged to this seller. Lifting the monthly waiver starts billing from today.
+      </p>
+      <div className="mt-3 flex flex-wrap gap-6">
+        <WaiverCheckbox
+          label="Waive registration fee"
+          checked={seller.registration_fee_waived === 1}
+          disabled={mutation.isPending || (registrationPaid && seller.registration_fee_waived !== 1)}
+          hint={registrationPaid && seller.registration_fee_waived !== 1 ? "already paid" : undefined}
+          onChange={(checked) => mutation.mutate({ registrationFeeWaived: checked })}
+        />
+        <WaiverCheckbox
+          label="Waive monthly fee"
+          checked={seller.monthly_fee_waived === 1}
+          disabled={mutation.isPending}
+          onChange={(checked) => mutation.mutate({ monthlyFeeWaived: checked })}
+        />
+      </div>
+    </div>
   )
 }

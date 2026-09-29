@@ -53,7 +53,7 @@ interface AdminRow {
 
 const adminSchema = z.object({
   fullName: z.string().min(2, "Required").max(150),
-  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician"]),
+  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"]),
   position: z.string().max(100).optional(),
   phoneNumber: z.string().max(20).optional(),
   isActive: z.boolean(),
@@ -80,12 +80,12 @@ function StaffPage() {
     mutationFn: ({ id, values }: { id: number; values: AdminFormValues }) =>
       api.patch(`/admins/${id}`, values),
     onSuccess: () => {
-      toast.success("Staff updated.")
+      toast.success("User updated.")
       queryClient.invalidateQueries({ queryKey: ["admins"] })
       setEditOpen(false)
       setEditingAdmin(null)
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't update staff."),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't update the user."),
   })
 
   const resetMutation = useMutation({
@@ -101,17 +101,17 @@ function StaffPage() {
   const deleteMutation = useMutation({
     mutationFn: (id: number) => api.delete(`/admins/${id}`),
     onSuccess: () => {
-      toast.success("Staff account deactivated.")
+      toast.success("User account deactivated.")
       queryClient.invalidateQueries({ queryKey: ["admins"] })
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't deactivate staff."),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't deactivate the user."),
   })
 
   const openEdit = (a: AdminRow) => {
     setEditingAdmin(a)
     editForm.reset({
       fullName: a.full_name,
-      role: a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician",
+      role: a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor",
       position: a.position ?? "",
       phoneNumber: a.phone_number ?? "",
       isActive: a.is_active === 1,
@@ -122,7 +122,7 @@ function StaffPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold text-foreground">Staff & Admins</h1>
+        <h1 className="text-2xl font-bold text-foreground">Users</h1>
         <div className="flex items-center gap-2">
           <div className="relative w-48">
             <Search className="absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -137,7 +137,7 @@ function StaffPage() {
             <Button asChild>
               <Link to="/admin/staff/new">
                 <Plus className="size-4" />
-                Add Staff
+                Add User
               </Link>
             </Button>
           )}
@@ -185,7 +185,7 @@ function StaffPage() {
                   </TableCell>
                   <TableCell>{a.staff_number}</TableCell>
                   <TableCell>
-                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician"} />
+                    <RoleBadge role={a.role as "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor"} />
                   </TableCell>
                   <TableCell>{a.position ?? <TableEmptyValue />}</TableCell>
                   <TableCell>{a.phone_number ?? <TableEmptyValue />}</TableCell>
@@ -203,7 +203,7 @@ function StaffPage() {
                           size="icon-sm"
                           aria-label={`Edit ${a.full_name}`}
                           onClick={() => openEdit(a)}
-                          title="Edit staff details"
+                          title="Edit user details"
                         >
                           <Pencil className="size-4" />
                         </Button>
@@ -245,7 +245,7 @@ function StaffPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Staff{editingAdmin ? ` — ${editingAdmin.full_name}` : ""}</DialogTitle>
+            <DialogTitle>Edit User{editingAdmin ? ` — ${editingAdmin.full_name}` : ""}</DialogTitle>
           </DialogHeader>
           <form
             onSubmit={editForm.handleSubmit((values) => {
@@ -278,6 +278,9 @@ function StaffPage() {
                         <SelectItem value="staff">Staff</SelectItem>
                         <SelectItem value="tutor">Tutor</SelectItem>
                         <SelectItem value="technician">Technician</SelectItem>
+                        <SelectItem value="stores">Stores</SelectItem>
+                        <SelectItem value="supervisor">Supervisor</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
                       </SelectContent>
                     </Select>
                   )}

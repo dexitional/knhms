@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import {
   createCategorySchema,
   createProductSchema,
@@ -12,13 +12,13 @@ import * as service from "./service.js";
 export const marketRoute = new Hono()
   // Public: the E-Market page lists active categories and products.
   .get("/public", async (c) => c.json(await service.getPublicCatalog()))
-  .get("/categories", requireAdminRole(ANY_ADMIN), async (c) =>
+  .get("/categories", requirePermission("market", "view"), async (c) =>
     c.json({ categories: await service.listCategories() }),
   )
-  .get("/products", requireAdminRole(ANY_ADMIN), async (c) =>
+  .get("/products", requirePermission("market", "view"), async (c) =>
     c.json({ products: await service.listProducts() }),
   )
-  .use("*", requireAdminRole(ADMIN_ONLY))
+  .use("*", requirePermission("market", "manage"))
   .post("/categories", zValidator("json", createCategorySchema), async (c) =>
     c.json({ category: await service.createCategory(c.req.valid("json")) }, 201),
   )

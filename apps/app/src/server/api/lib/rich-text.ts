@@ -20,8 +20,14 @@ const OPTIONS: sanitizeHtml.IOptions = {
   // else would render broken, so drop the tag entirely.
   exclusiveFilter: (frame) => frame.tag === "img" && !/^https?:\/\//i.test(frame.attribs.src ?? ""),
   transformTags: {
-    // Links always open safely in a new tab.
-    a: sanitizeHtml.simpleTransform("a", { target: "_blank", rel: "noopener noreferrer nofollow" }),
+    // External links open safely in a new tab; site links ("/register",
+    // "#section") stay in the same tab.
+    a: (tagName, attribs): sanitizeHtml.Tag => {
+      const href = attribs.href ?? "";
+      const internal = href.startsWith("/") && !href.startsWith("//");
+      if (internal || href.startsWith("#")) return { tagName, attribs: { href } };
+      return { tagName, attribs: { href, target: "_blank", rel: "noopener noreferrer nofollow" } };
+    },
   },
 };
 

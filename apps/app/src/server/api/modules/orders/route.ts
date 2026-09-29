@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
+import { requirePermission, requireStudent } from "../../middleware/require-auth.js";
 import { createOrderSchema, listOrdersQuerySchema, updateOrderAdminSchema } from "./schema.js";
 import * as service from "./service.js";
 
@@ -14,13 +14,13 @@ export const ordersRoute = new Hono()
     return c.json({ orders });
   })
 
-  .get("/", requireAdminRole(ANY_ADMIN), zValidator("query", listOrdersQuerySchema), async (c) => {
+  .get("/", requirePermission("orders", "view"), zValidator("query", listOrdersQuerySchema), async (c) => {
     const result = await service.listOrders(c.req.valid("query"));
     return c.json(result);
   })
   .patch(
     "/:id",
-    requireAdminRole(ANY_ADMIN),
+    requirePermission("orders", "manage"),
     zValidator("json", updateOrderAdminSchema),
     async (c) => {
       const order = await service.updateOrder(Number(c.req.param("id")), c.req.valid("json"));

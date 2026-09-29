@@ -36,6 +36,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select.tsx"
+import { canManage } from "#/lib/permissions"
+import { Pagination } from "#/components/pagination"
+
+const PAGE_SIZE = 15
 
 export const Route = createFileRoute("/admin/_admin/yellow-pages/")({
   component: YellowPagesAdminPage,
@@ -132,10 +136,11 @@ function toFormValues(e: DirectoryEntry): EntryFormValues {
 
 function YellowPagesAdminPage() {
   const { admin } = Route.useRouteContext()
-  const canEdit = admin.role === "super_admin" || admin.role === "admin"
+  const canEdit = canManage(admin.role, "yellowPages")
   const queryClient = useQueryClient()
   const [search, setSearch] = useState("")
   const [category, setCategory] = useState<Category | "all">("all")
+  const [page, setPage] = useState(1)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<DirectoryEntry | null>(null)
 
@@ -206,6 +211,9 @@ function YellowPagesAdminPage() {
           f?.toLowerCase().includes(query),
         )),
   )
+  // Stay on a real page when filtering or deleting shrinks the list.
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(entries.length / PAGE_SIZE)))
+  const pageEntries = entries.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
 
   return (
     <div className="flex flex-col gap-6">
@@ -217,7 +225,13 @@ function YellowPagesAdminPage() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Select value={category} onValueChange={(v) => setCategory(v as Category | "all")}>
+          <Select
+            value={category}
+            onValueChange={(v) => {
+              setCategory(v as Category | "all")
+              setPage(1)
+            }}
+          >
             <SelectTrigger className="w-44">
               <SelectValue />
             </SelectTrigger>
@@ -235,7 +249,10 @@ function YellowPagesAdminPage() {
             <Input
               placeholder="Search..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               className="pl-8"
             />
           </div>
@@ -271,7 +288,7 @@ function YellowPagesAdminPage() {
                 </TableCell>
               </TableRow>
             )}
-            {entries.map((e) => (
+            {pageEntries.map((e) => (
               <TableRow key={e.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -349,6 +366,9 @@ function YellowPagesAdminPage() {
             ))}
           </TableBody>
         </Table>
+        {entries.length > PAGE_SIZE && (
+          <Pagination page={currentPage} pageSize={PAGE_SIZE} total={entries.length} onPageChange={setPage} />
+        )}
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

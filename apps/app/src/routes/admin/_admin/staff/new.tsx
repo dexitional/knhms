@@ -26,7 +26,7 @@ export const Route = createFileRoute("/admin/_admin/staff/new")({
 const schema = z.object({
   fullName: z.string().min(2, "Required").max(150),
   staffNumber: z.string().min(1, "Required").max(50),
-  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician"]),
+  role: z.enum(["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"]),
   position: z.string().max(100).optional(),
   phoneNumber: z.string().max(20).optional(),
   photoUrl: z.string().url().optional(),
@@ -47,14 +47,14 @@ function NewStaffPage() {
   const createMutation = useMutation({
     mutationFn: (values: FormValues) => api.post("/admins", values),
     onSuccess: () => {
-      toast.success("Staff account created.");
+      toast.success("User account created.");
       navigate({ to: "/admin/staff" });
     },
-    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't create staff account."),
+    onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't create the user account."),
   });
 
   if (admin.role !== "super_admin") {
-    return <p className="text-muted-foreground">Only super admins can add staff accounts.</p>;
+    return <p className="text-muted-foreground">Only super admins can add user accounts.</p>;
   }
 
   return (
@@ -62,15 +62,15 @@ function NewStaffPage() {
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/admin/staff">
           <ArrowLeft className="size-4" />
-          Back to Staff
+          Back to Users
         </Link>
       </Button>
 
-      <h1 className="text-2xl font-bold text-foreground">Add Staff Account</h1>
+      <h1 className="text-2xl font-bold text-foreground">Add User Account</h1>
 
       <Card>
         <CardHeader>
-          <CardTitle>Staff Details</CardTitle>
+          <CardTitle>User Details</CardTitle>
         </CardHeader>
         <CardContent>
           <form
@@ -102,6 +102,9 @@ function NewStaffPage() {
                         <SelectItem value="staff">Staff</SelectItem>
                         <SelectItem value="tutor">Tutor</SelectItem>
                         <SelectItem value="technician">Technician</SelectItem>
+                        <SelectItem value="stores">Stores</SelectItem>
+                        <SelectItem value="supervisor">Supervisor</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                       </SelectContent>

@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
+import { requirePermission, requireStudent } from "../../middleware/require-auth.js";
 import { createSuggestionSchema, listSuggestionsQuerySchema } from "./schema.js";
 import * as service from "./service.js";
 
@@ -14,11 +14,11 @@ export const suggestionsRoute = new Hono()
     return c.json({ suggestions });
   })
 
-  .get("/", requireAdminRole(ANY_ADMIN), zValidator("query", listSuggestionsQuerySchema), async (c) => {
+  .get("/", requirePermission("suggestions", "view"), zValidator("query", listSuggestionsQuerySchema), async (c) => {
     const result = await service.listSuggestions(c.req.valid("query"));
     return c.json(result);
   })
-  .patch("/:id/review", requireAdminRole(ANY_ADMIN), async (c) => {
+  .patch("/:id/review", requirePermission("suggestions", "manage"), async (c) => {
     await service.markReviewed(Number(c.req.param("id")));
     return c.json({ ok: true });
   });

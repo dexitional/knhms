@@ -6,20 +6,26 @@ import type { z } from "zod";
 import { AppError } from "../../middleware/error-handler.js";
 import { generateTemporaryPassword } from "../../lib/password.js";
 import { ghanaPhoneToE164, maskPhone, sendSms } from "../../lib/sms.js";
-import { billingSummary, getBillingSettings, monthlyCoverage } from "./billing.js";
-import type { recordPaymentSchema, updateBillingSettingsSchema, updateSellerStatusSchema } from "./schema.js";
+import { addDays, billingSummary, getBillingSettings, monthlyCoverage, today } from "./billing.js";
+import type {
+  recordPaymentSchema,
+  updateBillingSettingsSchema,
+  updateFeeWaiversSchema,
+  updateSellerStatusSchema,
+} from "./schema.js";
 
 type SettingsInput = z.infer<typeof updateBillingSettingsSchema>;
 type StatusInput = z.infer<typeof updateSellerStatusSchema>;
 type PaymentInput = z.infer<typeof recordPaymentSchema>;
+type WaiversInput = z.infer<typeof updateFeeWaiversSchema>;
 
 export type PublicSeller = Omit<SellerRow, "password_hash" | "failed_login_attempts" | "locked_until">;
 
 // Never selects password_hash or lockout state.
 const SELLER_COLUMNS = `
-  id, seller_type, business_name, owner_name, email, phone, location, description,
+  id, seller_type, business_name, owner_name, email, phone, location, description, logo_url,
   status, status_reason, reviewed_by, reviewed_at, registration_paid_at, paid_until,
-  created_at, updated_at
+  registration_fee_waived, monthly_fee_waived, created_at, updated_at
 `;
 
 export async function getSeller(id: number): Promise<PublicSeller> {
@@ -113,6 +119,12 @@ export async function updateStatus(id: number, adminId: number, input: StatusInp
     "UPDATE sellers SET status = ?, status_reason = ?, reviewed_by = ?, reviewed_at = NOW() WHERE id = ?",
     [input.status, input.status === "approved" ? null : input.reason!, adminId, id],
   );
+  if (input.status === "approved") {
+    await applyWaivers(await getSeller(id), {
+      registrationFeeWaived: input.registrationFeeWaived,
+      monthlyFeeWaived: input.monthlyFeeWaived,
+    });
+  }
 
   const name = seller.business_name;
   if (input.status === "approved") {
@@ -131,6 +143,39 @@ export async function updateStatus(id: number, adminId: number, input: StatusInp
   return getSellerDetail(id);
 }
 
+// ---- Admin: fee waivers ------------------------------------------------------
+
+async function applyWaivers(seller: Awaited<ReturnType<typeof getSeller>>, input: WaiversInput) {
+  const columns: string[] = [];
+  const params: Array<number | string> = [];
+  if (input.registrationFeeWaived !== undefined) {
+    columns.push("registration_fee_waived = ?");
+    params.push(input.registrationFeeWaived ? 1 : 0);
+  }
+  if (input.monthlyFeeWaived !== undefined) {
+    columns.push("monthly_fee_waived = ?");
+    params.push(input.monthlyFeeWaived ? 1 : 0);
+    // Lifting a monthly waiver starts billing from today, rather than
+    // charging for the months that were waived.
+    const lifting = !input.monthlyFeeWaived && seller.monthly_fee_waived === 1;
+    const billing = seller.status === "approved" || seller.status === "suspended";
+    const yesterday = addDays(today(), -1);
+    if (lifting && billing && (!seller.paid_until || seller.paid_until < yesterday)) {
+      columns.push("paid_until = ?");
+      params.push(yesterday);
+    }
+  }
+  if (columns.length === 0) return;
+  await getPool().execute(`UPDATE sellers SET ${columns.join(", ")} WHERE id = ?`, [...params, seller.id]);
+}
+
+export async function updateFeeWaivers(id: number, input: WaiversInput) {
+  const seller = await getSeller(id);
+  if (seller.status === "rejected") throw new AppError("Can't change fees for a rejected seller.", 409);
+  await applyWaivers(seller, input);
+  return getSellerDetail(id);
+}
+
 // ---- Admin: payments ---------------------------------------------------------
 
 export async function recordPayment(sellerId: number, adminId: number, input: PaymentInput) {
@@ -138,6 +183,12 @@ export async function recordPayment(sellerId: number, adminId: number, input: Pa
   if (seller.status === "rejected") throw new AppError("Can't record payments for a rejected seller.", 409);
   if (input.kind === "registration" && seller.registration_paid_at) {
     throw new AppError("The registration fee has already been paid.", 409);
+  }
+  if (input.kind === "registration" && seller.registration_fee_waived) {
+    throw new AppError("The registration fee is waived for this seller.", 409);
+  }
+  if (input.kind === "monthly" && seller.monthly_fee_waived) {
+    throw new AppError("The monthly fee is waived for this seller.", 409);
   }
 
   const coverage = input.kind === "monthly" ? monthlyCoverage(seller.paid_until, input.months!) : null;

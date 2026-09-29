@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from "@tanstack/react-router"
+import { createFileRoute, Link, redirect } from "@tanstack/react-router"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -6,7 +6,6 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { api, ApiError } from "#/lib/api-client"
 import { sellerOverviewQuery } from "#/lib/sellers"
-import { FileUploadField } from "#/components/file-upload-field"
 import { FormField } from "#/components/form-field"
 import { MenuManager } from "#/components/menu-manager"
 import type { MenuItem } from "#/components/menu-manager"
@@ -74,7 +73,6 @@ function SellerMenuPage() {
 const vendorSchema = z.object({
   cuisine: z.string().max(100),
   description: z.string().max(500),
-  logoUrl: z.string().url().optional(),
   openingHours: z.string().max(150),
   delivers: z.boolean(),
   isOpen: z.boolean(),
@@ -88,7 +86,6 @@ function VendorProfileForm({ vendor, canManage }: { vendor: Vendor; canManage: b
     defaultValues: {
       cuisine: vendor.cuisine ?? "",
       description: vendor.description ?? "",
-      logoUrl: vendor.logo_url ?? undefined,
       openingHours: vendor.opening_hours ?? "",
       delivers: vendor.delivers === 1,
       isOpen: vendor.is_open === 1,
@@ -96,7 +93,7 @@ function VendorProfileForm({ vendor, canManage }: { vendor: Vendor; canManage: b
   })
 
   const mutation = useMutation({
-    mutationFn: (values: VendorValues) => api.patch("/seller/vendor", { ...values, logoUrl: values.logoUrl ?? "" }),
+    mutationFn: (values: VendorValues) => api.patch("/seller/vendor", values),
     onSuccess: () => {
       toast.success("Vendor profile saved.")
       queryClient.invalidateQueries({ queryKey: VENDOR_QUERY_KEY })
@@ -122,13 +119,13 @@ function VendorProfileForm({ vendor, canManage }: { vendor: Vendor; canManage: b
             <Textarea rows={2} {...form.register("description")} />
           </FormField>
         </div>
-        <FileUploadField
-          label="Logo (optional)"
-          helpText="JPEG, PNG, or WebP. Shown uncropped on white."
-          folder="market-images"
-          value={form.watch("logoUrl")}
-          onChange={(url) => form.setValue("logoUrl", url, { shouldDirty: true })}
-        />
+        <p className="text-sm text-muted-foreground">
+          Your logo is managed on the{" "}
+          <Link to="/seller/account" className="font-medium text-primary hover:underline">
+            Account
+          </Link>{" "}
+          page.
+        </p>
         <div className="flex flex-wrap gap-6">
           <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">
             <input type="checkbox" className="h-4 w-4 rounded border-input" {...form.register("isOpen")} />

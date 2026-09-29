@@ -22,6 +22,7 @@ import type {
 } from '@knh/db'
 import { getMarketCatalog } from '#/server/market'
 import { asset } from '#/lib/asset'
+import { SellerLogo } from '#/components/seller-logo'
 import {
   AUDIENCE_LABELS,
   discountPercent,
@@ -43,7 +44,8 @@ export const Route = createFileRoute('/_web/e-market')({
   component: EMarketPage,
 })
 
-type Product = MarketProductRow
+// Public listings carry the seller's logo (sellers.logo_url) when they have one.
+type Product = MarketProductRow & { seller_logo_url?: string | null }
 type Category = MarketCategoryRow
 type Vendor = FoodVendorRow & { menu: Array<FoodMenuItemRow> }
 type Audience = 'all' | 'students' | 'staff'
@@ -737,6 +739,31 @@ function Chip({
   )
 }
 
+// Anonymous analytics for sellers (views and order clicks). sendBeacon
+// survives the page navigating away (tel: links, WhatsApp tabs) and never
+// blocks or errors in front of the shopper.
+type MarketEvent =
+  | { type: 'product_view'; productId: number }
+  | { type: 'vendor_view'; vendorId: number }
+  | { type: 'order_click'; channel: 'whatsapp' | 'call'; productId?: number; vendorId?: number }
+
+function track(event: MarketEvent) {
+  try {
+    const body = JSON.stringify(event)
+    const sent = navigator.sendBeacon('/api/analytics/events', new Blob([body], { type: 'application/json' }))
+    if (!sent) {
+      void fetch('/api/analytics/events', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body,
+        keepalive: true,
+      }).catch(() => {})
+    }
+  } catch {
+    // Analytics must never get in the way.
+  }
+}
+
 // "+233 (0) 24 123 4567" / "024 123 4567" → "233241234567" for wa.me links.
 function toWhatsAppNumber(phone: string) {
   const digits = phone.replace(/\(0\)/g, '').replace(/\D/g, '')
@@ -752,6 +779,11 @@ function ProductDialog({
   category?: Category
   onClose: () => void
 }) {
+  const productId = product?.id
+  useEffect(() => {
+    if (productId) track({ type: 'product_view', productId })
+  }, [productId])
+
   return (
     <Dialog open={product != null} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
@@ -810,15 +842,26 @@ function ProductDialog({
                 <p className="text-xs font-semibold tracking-widest text-muted-foreground uppercase">
                   Seller
                 </p>
-                <p className="mt-1 font-semibold text-foreground">
-                  {product.seller_name}
-                </p>
-                {product.seller_location && (
-                  <p className="flex items-center gap-1.5 text-muted-foreground">
-                    <MapPin className="size-3.5 text-primary" />
-                    {product.seller_location}
-                  </p>
-                )}
+                <div className="mt-2 flex items-center gap-3">
+                  {product.seller_name && (
+                    <SellerLogo
+                      logoUrl={product.seller_logo_url ?? null}
+                      name={product.seller_name}
+                      className="size-12"
+                    />
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-foreground">
+                      {product.seller_name}
+                    </p>
+                    {product.seller_location && (
+                      <p className="flex items-center gap-1.5 text-muted-foreground">
+                        <MapPin className="size-3.5 shrink-0 text-primary" />
+                        {product.seller_location}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 {product.seller_phone && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     <Button asChild size="sm">
@@ -826,6 +869,7 @@ function ProductDialog({
                         href={`https://wa.me/${toWhatsAppNumber(product.seller_phone)}?text=${encodeURIComponent(`Hi, I'm interested in "${product.name}" on the KNH E-Market.`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
+                        onClick={() => track({ type: 'order_click', channel: 'whatsapp', productId: product.id })}
                       >
                         <MessageCircle /> WhatsApp Seller
                       </a>
@@ -833,6 +877,7 @@ function ProductDialog({
                     <Button asChild size="sm" variant="outline">
                       <a
                         href={`tel:+${toWhatsAppNumber(product.seller_phone)}`}
+                        onClick={() => track({ type: 'order_click', channel: 'call', productId: product.id })}
                       >
                         <Phone /> Call
                       </a>
@@ -971,6 +1016,11 @@ function VendorMenuDialog({
   vendor: Vendor | null
   onClose: () => void
 }) {
+  const vendorId = vendor?.id
+  useEffect(() => {
+    if (vendorId) track({ type: 'vendor_view', vendorId })
+  }, [vendorId])
+
   // Group by section, keeping the admin's item order within each.
   const sections = new Map<string, Array<FoodMenuItemRow>>()
   for (const item of vendor?.menu ?? []) {
@@ -1033,12 +1083,16 @@ function VendorMenuDialog({
                     href={`https://wa.me/${toWhatsAppNumber(vendor.phone)}?text=${encodeURIComponent(`Hi ${vendor.name}, I'd like to order from your menu on the KNH E-Market.`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => track({ type: 'order_click', channel: 'whatsapp', vendorId: vendor.id })}
                   >
                     <MessageCircle /> Order on WhatsApp
                   </a>
                 </Button>
                 <Button asChild size="sm" variant="outline">
-                  <a href={`tel:+${toWhatsAppNumber(vendor.phone)}`}>
+                  <a
+                    href={`tel:+${toWhatsAppNumber(vendor.phone)}`}
+                    onClick={() => track({ type: 'order_click', channel: 'call', vendorId: vendor.id })}
+                  >
                     <Phone /> Call
                   </a>
                 </Button>

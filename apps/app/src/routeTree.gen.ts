@@ -14,6 +14,7 @@ import { Route as WebIndexRouteImport } from './routes/_web/index'
 import { Route as WebEMarketRouteImport } from './routes/_web/e-market'
 import { Route as WebFreshmenRouteImport } from './routes/_web/freshmen'
 import { Route as WebKnhHubRouteImport } from './routes/_web/knh-hub'
+import { Route as WebQrcodeRouteImport } from './routes/_web/qrcode'
 import { Route as WebRegisterRouteImport } from './routes/_web/register'
 import { Route as WebYellowPagesRouteImport } from './routes/_web/yellow-pages'
 import { Route as AdminAdminRouteRouteImport } from './routes/admin/_admin/route'
@@ -29,9 +30,11 @@ import { Route as StudentLoginRouteImport } from './routes/student/login'
 import { Route as AdminAdminIndexRouteImport } from './routes/admin/_admin/index'
 import { Route as AdminAdminAccountRouteImport } from './routes/admin/_admin/account'
 import { Route as AdminAdminReportsRouteImport } from './routes/admin/_admin/reports'
+import { Route as PrintInventoryRequestIdRouteImport } from './routes/print/inventory/$requestId'
 import { Route as PrintRepairsRequestIdRouteImport } from './routes/print/repairs/$requestId'
 import { Route as SellerSellerIndexRouteImport } from './routes/seller/_seller/index'
 import { Route as SellerSellerAccountRouteImport } from './routes/seller/_seller/account'
+import { Route as SellerSellerAnalyticsRouteImport } from './routes/seller/_seller/analytics'
 import { Route as SellerSellerBillingRouteImport } from './routes/seller/_seller/billing'
 import { Route as SellerSellerMenuRouteImport } from './routes/seller/_seller/menu'
 import { Route as SellerSellerProductsRouteImport } from './routes/seller/_seller/products'
@@ -39,7 +42,9 @@ import { Route as StudentStudentIndexRouteImport } from './routes/student/_stude
 import { Route as StudentStudentProfileRouteImport } from './routes/student/_student/profile'
 import { Route as StudentStudentSuggestionsRouteImport } from './routes/student/_student/suggestions'
 import { Route as AdminAdminEMarketIndexRouteImport } from './routes/admin/_admin/e-market/index'
+import { Route as AdminAdminFreshmenIndexRouteImport } from './routes/admin/_admin/freshmen/index'
 import { Route as AdminAdminHubIndexRouteImport } from './routes/admin/_admin/hub/index'
+import { Route as AdminAdminInventoryIndexRouteImport } from './routes/admin/_admin/inventory/index'
 import { Route as AdminAdminOrdersIndexRouteImport } from './routes/admin/_admin/orders/index'
 import { Route as AdminAdminRepairsIndexRouteImport } from './routes/admin/_admin/repairs/index'
 import { Route as AdminAdminRepairsRequestIdRouteImport } from './routes/admin/_admin/repairs/$requestId'
@@ -81,6 +86,11 @@ const WebFreshmenRoute = WebFreshmenRouteImport.update({
 const WebKnhHubRoute = WebKnhHubRouteImport.update({
   id: '/knh-hub',
   path: '/knh-hub',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebQrcodeRoute = WebQrcodeRouteImport.update({
+  id: '/qrcode',
+  path: '/qrcode',
   getParentRoute: () => WebRouteRoute,
 } as any)
 const WebRegisterRoute = WebRegisterRouteImport.update({
@@ -158,6 +168,11 @@ const AdminAdminReportsRoute = AdminAdminReportsRouteImport.update({
   path: '/reports',
   getParentRoute: () => AdminAdminRouteRoute,
 } as any)
+const PrintInventoryRequestIdRoute = PrintInventoryRequestIdRouteImport.update({
+  id: '/print/inventory/$requestId',
+  path: '/print/inventory/$requestId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrintRepairsRequestIdRoute = PrintRepairsRequestIdRouteImport.update({
   id: '/print/repairs/$requestId',
   path: '/print/repairs/$requestId',
@@ -171,6 +186,11 @@ const SellerSellerIndexRoute = SellerSellerIndexRouteImport.update({
 const SellerSellerAccountRoute = SellerSellerAccountRouteImport.update({
   id: '/account',
   path: '/account',
+  getParentRoute: () => SellerSellerRouteRoute,
+} as any)
+const SellerSellerAnalyticsRoute = SellerSellerAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => SellerSellerRouteRoute,
 } as any)
 const SellerSellerBillingRoute = SellerSellerBillingRouteImport.update({
@@ -209,11 +229,22 @@ const AdminAdminEMarketIndexRoute = AdminAdminEMarketIndexRouteImport.update({
   path: '/e-market/',
   getParentRoute: () => AdminAdminRouteRoute,
 } as any)
+const AdminAdminFreshmenIndexRoute = AdminAdminFreshmenIndexRouteImport.update({
+  id: '/freshmen/',
+  path: '/freshmen/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
 const AdminAdminHubIndexRoute = AdminAdminHubIndexRouteImport.update({
   id: '/hub/',
   path: '/hub/',
   getParentRoute: () => AdminAdminRouteRoute,
 } as any)
+const AdminAdminInventoryIndexRoute =
+  AdminAdminInventoryIndexRouteImport.update({
+    id: '/inventory/',
+    path: '/inventory/',
+    getParentRoute: () => AdminAdminRouteRoute,
+  } as any)
 const AdminAdminOrdersIndexRoute = AdminAdminOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -321,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/e-market': typeof WebEMarketRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
+  '/qrcode': typeof WebQrcodeRoute
   '/register': typeof WebRegisterRoute
   '/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
@@ -332,8 +364,10 @@ export interface FileRoutesByFullPath {
   '/student/login': typeof StudentLoginRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
+  '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/seller/account': typeof SellerSellerAccountRoute
+  '/seller/analytics': typeof SellerSellerAnalyticsRoute
   '/seller/billing': typeof SellerSellerBillingRoute
   '/seller/menu': typeof SellerSellerMenuRoute
   '/seller/products': typeof SellerSellerProductsRoute
@@ -351,7 +385,9 @@ export interface FileRoutesByFullPath {
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
   '/admin/e-market/': typeof AdminAdminEMarketIndexRoute
+  '/admin/freshmen/': typeof AdminAdminFreshmenIndexRoute
   '/admin/hub/': typeof AdminAdminHubIndexRoute
+  '/admin/inventory/': typeof AdminAdminInventoryIndexRoute
   '/admin/orders/': typeof AdminAdminOrdersIndexRoute
   '/admin/repairs/': typeof AdminAdminRepairsIndexRoute
   '/admin/rooms/': typeof AdminAdminRoomsIndexRoute
@@ -367,6 +403,7 @@ export interface FileRoutesByTo {
   '/e-market': typeof WebEMarketRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
+  '/qrcode': typeof WebQrcodeRoute
   '/register': typeof WebRegisterRoute
   '/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
@@ -379,8 +416,10 @@ export interface FileRoutesByTo {
   '/': typeof WebIndexRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
+  '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/seller/account': typeof SellerSellerAccountRoute
+  '/seller/analytics': typeof SellerSellerAnalyticsRoute
   '/seller/billing': typeof SellerSellerBillingRoute
   '/seller/menu': typeof SellerSellerMenuRoute
   '/seller/products': typeof SellerSellerProductsRoute
@@ -398,7 +437,9 @@ export interface FileRoutesByTo {
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
   '/admin/e-market': typeof AdminAdminEMarketIndexRoute
+  '/admin/freshmen': typeof AdminAdminFreshmenIndexRoute
   '/admin/hub': typeof AdminAdminHubIndexRoute
+  '/admin/inventory': typeof AdminAdminInventoryIndexRoute
   '/admin/orders': typeof AdminAdminOrdersIndexRoute
   '/admin/repairs': typeof AdminAdminRepairsIndexRoute
   '/admin/rooms': typeof AdminAdminRoomsIndexRoute
@@ -419,6 +460,7 @@ export interface FileRoutesById {
   '/_web/e-market': typeof WebEMarketRoute
   '/_web/freshmen': typeof WebFreshmenRoute
   '/_web/knh-hub': typeof WebKnhHubRoute
+  '/_web/qrcode': typeof WebQrcodeRoute
   '/_web/register': typeof WebRegisterRoute
   '/_web/yellow-pages': typeof WebYellowPagesRoute
   '/admin/forgot-password': typeof AdminForgotPasswordRoute
@@ -431,8 +473,10 @@ export interface FileRoutesById {
   '/_web/': typeof WebIndexRoute
   '/admin/_admin/account': typeof AdminAdminAccountRoute
   '/admin/_admin/reports': typeof AdminAdminReportsRoute
+  '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
   '/print/repairs/$requestId': typeof PrintRepairsRequestIdRoute
   '/seller/_seller/account': typeof SellerSellerAccountRoute
+  '/seller/_seller/analytics': typeof SellerSellerAnalyticsRoute
   '/seller/_seller/billing': typeof SellerSellerBillingRoute
   '/seller/_seller/menu': typeof SellerSellerMenuRoute
   '/seller/_seller/products': typeof SellerSellerProductsRoute
@@ -450,7 +494,9 @@ export interface FileRoutesById {
   '/student/_student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/_student/repairs/new': typeof StudentStudentRepairsNewRoute
   '/admin/_admin/e-market/': typeof AdminAdminEMarketIndexRoute
+  '/admin/_admin/freshmen/': typeof AdminAdminFreshmenIndexRoute
   '/admin/_admin/hub/': typeof AdminAdminHubIndexRoute
+  '/admin/_admin/inventory/': typeof AdminAdminInventoryIndexRoute
   '/admin/_admin/orders/': typeof AdminAdminOrdersIndexRoute
   '/admin/_admin/repairs/': typeof AdminAdminRepairsIndexRoute
   '/admin/_admin/rooms/': typeof AdminAdminRoomsIndexRoute
@@ -472,6 +518,7 @@ export interface FileRouteTypes {
     | '/e-market'
     | '/freshmen'
     | '/knh-hub'
+    | '/qrcode'
     | '/register'
     | '/yellow-pages'
     | '/admin/forgot-password'
@@ -483,8 +530,10 @@ export interface FileRouteTypes {
     | '/student/login'
     | '/admin/account'
     | '/admin/reports'
+    | '/print/inventory/$requestId'
     | '/print/repairs/$requestId'
     | '/seller/account'
+    | '/seller/analytics'
     | '/seller/billing'
     | '/seller/menu'
     | '/seller/products'
@@ -502,7 +551,9 @@ export interface FileRouteTypes {
     | '/student/orders/new'
     | '/student/repairs/new'
     | '/admin/e-market/'
+    | '/admin/freshmen/'
     | '/admin/hub/'
+    | '/admin/inventory/'
     | '/admin/orders/'
     | '/admin/repairs/'
     | '/admin/rooms/'
@@ -518,6 +569,7 @@ export interface FileRouteTypes {
     | '/e-market'
     | '/freshmen'
     | '/knh-hub'
+    | '/qrcode'
     | '/register'
     | '/yellow-pages'
     | '/admin/forgot-password'
@@ -530,8 +582,10 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/account'
     | '/admin/reports'
+    | '/print/inventory/$requestId'
     | '/print/repairs/$requestId'
     | '/seller/account'
+    | '/seller/analytics'
     | '/seller/billing'
     | '/seller/menu'
     | '/seller/products'
@@ -549,7 +603,9 @@ export interface FileRouteTypes {
     | '/student/orders/new'
     | '/student/repairs/new'
     | '/admin/e-market'
+    | '/admin/freshmen'
     | '/admin/hub'
+    | '/admin/inventory'
     | '/admin/orders'
     | '/admin/repairs'
     | '/admin/rooms'
@@ -569,6 +625,7 @@ export interface FileRouteTypes {
     | '/_web/e-market'
     | '/_web/freshmen'
     | '/_web/knh-hub'
+    | '/_web/qrcode'
     | '/_web/register'
     | '/_web/yellow-pages'
     | '/admin/forgot-password'
@@ -581,8 +638,10 @@ export interface FileRouteTypes {
     | '/_web/'
     | '/admin/_admin/account'
     | '/admin/_admin/reports'
+    | '/print/inventory/$requestId'
     | '/print/repairs/$requestId'
     | '/seller/_seller/account'
+    | '/seller/_seller/analytics'
     | '/seller/_seller/billing'
     | '/seller/_seller/menu'
     | '/seller/_seller/products'
@@ -600,7 +659,9 @@ export interface FileRouteTypes {
     | '/student/_student/orders/new'
     | '/student/_student/repairs/new'
     | '/admin/_admin/e-market/'
+    | '/admin/_admin/freshmen/'
     | '/admin/_admin/hub/'
+    | '/admin/_admin/inventory/'
     | '/admin/_admin/orders/'
     | '/admin/_admin/repairs/'
     | '/admin/_admin/rooms/'
@@ -625,6 +686,7 @@ export interface RootRouteChildren {
   SellerRegisterRoute: typeof SellerRegisterRoute
   StudentForgotPinRoute: typeof StudentForgotPinRoute
   StudentLoginRoute: typeof StudentLoginRoute
+  PrintInventoryRequestIdRoute: typeof PrintInventoryRequestIdRoute
   PrintRepairsRequestIdRoute: typeof PrintRepairsRequestIdRoute
 }
 
@@ -663,6 +725,13 @@ declare module '@tanstack/react-router' {
       path: '/knh-hub'
       fullPath: '/knh-hub'
       preLoaderRoute: typeof WebKnhHubRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/qrcode': {
+      id: '/_web/qrcode'
+      path: '/qrcode'
+      fullPath: '/qrcode'
+      preLoaderRoute: typeof WebQrcodeRouteImport
       parentRoute: typeof WebRouteRoute
     }
     '/_web/register': {
@@ -770,6 +839,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminReportsRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
+    '/print/inventory/$requestId': {
+      id: '/print/inventory/$requestId'
+      path: '/print/inventory/$requestId'
+      fullPath: '/print/inventory/$requestId'
+      preLoaderRoute: typeof PrintInventoryRequestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/print/repairs/$requestId': {
       id: '/print/repairs/$requestId'
       path: '/print/repairs/$requestId'
@@ -789,6 +865,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/seller/account'
       preLoaderRoute: typeof SellerSellerAccountRouteImport
+      parentRoute: typeof SellerSellerRouteRoute
+    }
+    '/seller/_seller/analytics': {
+      id: '/seller/_seller/analytics'
+      path: '/analytics'
+      fullPath: '/seller/analytics'
+      preLoaderRoute: typeof SellerSellerAnalyticsRouteImport
       parentRoute: typeof SellerSellerRouteRoute
     }
     '/seller/_seller/billing': {
@@ -840,11 +923,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminEMarketIndexRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
+    '/admin/_admin/freshmen/': {
+      id: '/admin/_admin/freshmen/'
+      path: '/freshmen'
+      fullPath: '/admin/freshmen/'
+      preLoaderRoute: typeof AdminAdminFreshmenIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
     '/admin/_admin/hub/': {
       id: '/admin/_admin/hub/'
       path: '/hub'
       fullPath: '/admin/hub/'
       preLoaderRoute: typeof AdminAdminHubIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
+    '/admin/_admin/inventory/': {
+      id: '/admin/_admin/inventory/'
+      path: '/inventory'
+      fullPath: '/admin/inventory/'
+      preLoaderRoute: typeof AdminAdminInventoryIndexRouteImport
       parentRoute: typeof AdminAdminRouteRoute
     }
     '/admin/_admin/orders/': {
@@ -980,6 +1077,7 @@ interface WebRouteRouteChildren {
   WebEMarketRoute: typeof WebEMarketRoute
   WebFreshmenRoute: typeof WebFreshmenRoute
   WebKnhHubRoute: typeof WebKnhHubRoute
+  WebQrcodeRoute: typeof WebQrcodeRoute
   WebRegisterRoute: typeof WebRegisterRoute
   WebYellowPagesRoute: typeof WebYellowPagesRoute
   WebIndexRoute: typeof WebIndexRoute
@@ -989,6 +1087,7 @@ const WebRouteRouteChildren: WebRouteRouteChildren = {
   WebEMarketRoute: WebEMarketRoute,
   WebFreshmenRoute: WebFreshmenRoute,
   WebKnhHubRoute: WebKnhHubRoute,
+  WebQrcodeRoute: WebQrcodeRoute,
   WebRegisterRoute: WebRegisterRoute,
   WebYellowPagesRoute: WebYellowPagesRoute,
   WebIndexRoute: WebIndexRoute,
@@ -1009,7 +1108,9 @@ interface AdminAdminRouteRouteChildren {
   AdminAdminStaffNewRoute: typeof AdminAdminStaffNewRoute
   AdminAdminStudentsStudentIdRoute: typeof AdminAdminStudentsStudentIdRoute
   AdminAdminEMarketIndexRoute: typeof AdminAdminEMarketIndexRoute
+  AdminAdminFreshmenIndexRoute: typeof AdminAdminFreshmenIndexRoute
   AdminAdminHubIndexRoute: typeof AdminAdminHubIndexRoute
+  AdminAdminInventoryIndexRoute: typeof AdminAdminInventoryIndexRoute
   AdminAdminOrdersIndexRoute: typeof AdminAdminOrdersIndexRoute
   AdminAdminRepairsIndexRoute: typeof AdminAdminRepairsIndexRoute
   AdminAdminRoomsIndexRoute: typeof AdminAdminRoomsIndexRoute
@@ -1031,7 +1132,9 @@ const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
   AdminAdminStaffNewRoute: AdminAdminStaffNewRoute,
   AdminAdminStudentsStudentIdRoute: AdminAdminStudentsStudentIdRoute,
   AdminAdminEMarketIndexRoute: AdminAdminEMarketIndexRoute,
+  AdminAdminFreshmenIndexRoute: AdminAdminFreshmenIndexRoute,
   AdminAdminHubIndexRoute: AdminAdminHubIndexRoute,
+  AdminAdminInventoryIndexRoute: AdminAdminInventoryIndexRoute,
   AdminAdminOrdersIndexRoute: AdminAdminOrdersIndexRoute,
   AdminAdminRepairsIndexRoute: AdminAdminRepairsIndexRoute,
   AdminAdminRoomsIndexRoute: AdminAdminRoomsIndexRoute,
@@ -1048,6 +1151,7 @@ const AdminAdminRouteRouteWithChildren = AdminAdminRouteRoute._addFileChildren(
 
 interface SellerSellerRouteRouteChildren {
   SellerSellerAccountRoute: typeof SellerSellerAccountRoute
+  SellerSellerAnalyticsRoute: typeof SellerSellerAnalyticsRoute
   SellerSellerBillingRoute: typeof SellerSellerBillingRoute
   SellerSellerMenuRoute: typeof SellerSellerMenuRoute
   SellerSellerProductsRoute: typeof SellerSellerProductsRoute
@@ -1056,6 +1160,7 @@ interface SellerSellerRouteRouteChildren {
 
 const SellerSellerRouteRouteChildren: SellerSellerRouteRouteChildren = {
   SellerSellerAccountRoute: SellerSellerAccountRoute,
+  SellerSellerAnalyticsRoute: SellerSellerAnalyticsRoute,
   SellerSellerBillingRoute: SellerSellerBillingRoute,
   SellerSellerMenuRoute: SellerSellerMenuRoute,
   SellerSellerProductsRoute: SellerSellerProductsRoute,
@@ -1100,6 +1205,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellerRegisterRoute: SellerRegisterRoute,
   StudentForgotPinRoute: StudentForgotPinRoute,
   StudentLoginRoute: StudentLoginRoute,
+  PrintInventoryRequestIdRoute: PrintInventoryRequestIdRoute,
   PrintRepairsRequestIdRoute: PrintRepairsRequestIdRoute,
 }
 export const routeTree = rootRouteImport

@@ -18,7 +18,7 @@ export function BillingSummaryCard({ billing }: { billing: BillingSummary }) {
   const rows: Array<[string, React.ReactNode]> = [
     [
       "Registration fee",
-      billing.registrationFee === 0 ? (
+      billing.registrationWaived ? (
         "Waived"
       ) : (
         <span>
@@ -29,8 +29,8 @@ export function BillingSummaryCard({ billing }: { billing: BillingSummary }) {
         </span>
       ),
     ],
-    ["Monthly fee", billing.monthlyFee === 0 ? "Waived" : formatCedis(billing.monthlyFee)],
-    ["Paid up to", formatDate(billing.paidUntil)],
+    ["Monthly fee", billing.monthlyWaived ? "Waived" : formatCedis(billing.monthlyFee)],
+    ["Paid up to", billing.monthlyWaived ? "—" : formatDate(billing.paidUntil)],
   ]
 
   return (

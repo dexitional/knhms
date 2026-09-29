@@ -25,6 +25,8 @@ import { Input } from "#/components/ui/input.tsx"
 import { Textarea } from "#/components/ui/textarea.tsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#/components/ui/table.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
+import { SellerLogo } from "#/components/seller-logo"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/sellers/")({
   component: SellersPage,
@@ -43,7 +45,7 @@ const FILTERS: Array<[SellerStatus | "all" | "overdue", string]> = [
 
 function SellersPage() {
   const { admin } = Route.useRouteContext()
-  const canEdit = admin.role === "super_admin" || admin.role === "admin"
+  const canEdit = canManage(admin.role, "sellers")
   const [filter, setFilter] = useState<(typeof FILTERS)[number][0]>("pending")
   const [search, setSearch] = useState("")
 
@@ -128,14 +130,19 @@ function SellersPage() {
             {visible.map((s) => (
               <TableRow key={s.id}>
                 <TableCell>
-                  <Link
-                    to="/admin/sellers/$sellerId"
-                    params={{ sellerId: String(s.id) }}
-                    className="font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    {s.business_name}
-                  </Link>
-                  <p className="text-xs text-muted-foreground">{s.owner_name}</p>
+                  <div className="flex items-center gap-3">
+                    <SellerLogo logoUrl={s.logo_url} name={s.business_name} />
+                    <div>
+                      <Link
+                        to="/admin/sellers/$sellerId"
+                        params={{ sellerId: String(s.id) }}
+                        className="font-medium text-foreground hover:text-primary hover:underline"
+                      >
+                        {s.business_name}
+                      </Link>
+                      <p className="text-xs text-muted-foreground">{s.owner_name}</p>
+                    </div>
+                  </div>
                 </TableCell>
                 <TableCell>{SELLER_TYPE_LABELS[s.seller_type]}</TableCell>
                 <TableCell>

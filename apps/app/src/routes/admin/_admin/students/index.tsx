@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { Search } from "lucide-react"
+import { Eye, Search, Settings2 } from "lucide-react"
 import { api } from "#/lib/api-client"
+import { canManage } from "#/lib/permissions"
+import { Button } from "#/components/ui/button.tsx"
 import { Badge } from "#/components/ui/badge.tsx"
 import { Input } from "#/components/ui/input.tsx"
 import {
@@ -38,6 +40,9 @@ interface StudentRow {
 const PAGE_SIZE = 20
 
 function StudentsPage() {
+  const { admin } = Route.useRouteContext()
+  // View-only roles (e.g. supervisors) get a "View" button instead.
+  const canEdit = canManage(admin.role, "students")
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
   const [viewerOpen, setViewerOpen] = useState(false)
@@ -83,6 +88,7 @@ function StudentsPage() {
               <TableHead>Gender</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
+              <TableHead className="text-right" />
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -99,15 +105,7 @@ function StudentsPage() {
                     }}
                   />
                 </TableCell>
-                <TableCell>
-                  <Link
-                    to="/admin/students/$studentId"
-                    params={{ studentId: String(student.id) }}
-                    className="font-medium text-foreground hover:text-primary hover:underline"
-                  >
-                    {student.full_name}
-                  </Link>
-                </TableCell>
+                <TableCell className="font-medium text-foreground">{student.full_name}</TableCell>
                 <TableCell>{student.registration_number}</TableCell>
                 <TableCell>
                   <RoomNumberBadge roomNumber={student.room_number} />
@@ -120,6 +118,14 @@ function StudentsPage() {
                 </TableCell>
                 <TableCell className="text-muted-foreground">{student.email}</TableCell>
                 <TableCell className="text-muted-foreground">{student.phone_country_code} {student.phone_number}</TableCell>
+                <TableCell className="text-right">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to="/admin/students/$studentId" params={{ studentId: String(student.id) }}>
+                      {canEdit ? <Settings2 className="size-4" /> : <Eye className="size-4" />}
+                      {canEdit ? "Manage" : "View"}
+                    </Link>
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

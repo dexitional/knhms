@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import {
   createMenuItemSchema,
   createVendorSchema,
@@ -15,10 +15,10 @@ const itemId = (c: { req: { param: (k: string) => string } }) => Number(c.req.pa
 export const foodRoute = new Hono()
   // Public: the E-Market page lists active vendors and their menus.
   .get("/public", async (c) => c.json({ vendors: await service.listPublicVendors() }))
-  .get("/vendors", requireAdminRole(ANY_ADMIN), async (c) =>
+  .get("/vendors", requirePermission("market", "view"), async (c) =>
     c.json({ vendors: await service.listVendors() }),
   )
-  .use("*", requireAdminRole(ADMIN_ONLY))
+  .use("*", requirePermission("market", "manage"))
   .post("/vendors", zValidator("json", createVendorSchema), async (c) =>
     c.json({ vendor: await service.createVendor(c.req.valid("json")) }, 201),
   )

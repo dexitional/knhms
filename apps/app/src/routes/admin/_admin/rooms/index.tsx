@@ -39,6 +39,7 @@ import { ImageViewer } from "#/components/image-viewer"
 import { RoomNumberBadge } from "#/components/room-number-badge"
 import { BlockBadge } from "#/components/block-badge"
 import { GenderBadge } from "#/components/gender-badge"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/rooms/")({
   component: RoomsPage,
@@ -110,6 +111,8 @@ const roomSchema = z.object({
 type RoomFormValues = z.infer<typeof roomSchema>
 
 function RoomsPage() {
+  const { admin } = Route.useRouteContext()
+  const canEdit = canManage(admin.role, "rooms")
   const queryClient = useQueryClient()
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState("")
@@ -184,6 +187,7 @@ function RoomsPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-foreground">Rooms</h1>
+        {canEdit && (
         <div className="flex gap-2">
           <Button asChild variant="outline">
             <Link to="/admin/rooms/upload">
@@ -262,6 +266,7 @@ function RoomsPage() {
             </DialogContent>
           </Dialog>
         </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
@@ -314,6 +319,7 @@ function RoomsPage() {
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
+                  {canEdit && (
                   <div className="flex items-center justify-end gap-1">
                     <Button
                       variant="ghost"
@@ -335,6 +341,7 @@ function RoomsPage() {
                       <Trash2 className="size-4 text-destructive" />
                     </Button>
                   </div>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

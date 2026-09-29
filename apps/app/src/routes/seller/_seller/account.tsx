@@ -7,6 +7,7 @@ import { toast } from "sonner"
 import { api, ApiError } from "#/lib/api-client"
 import { sellerOverviewQuery } from "#/lib/sellers"
 import type { Seller } from "#/lib/sellers"
+import { FileUploadField } from "#/components/file-upload-field"
 import { FormField } from "#/components/form-field"
 import { Button } from "#/components/ui/button.tsx"
 import { Input } from "#/components/ui/input.tsx"
@@ -37,6 +38,7 @@ const profileSchema = z.object({
   phone: z.string().trim().min(10, "Enter a valid phone number").max(30),
   location: z.string().max(255),
   description: z.string().max(500),
+  logoUrl: z.string().url().optional(),
 })
 type ProfileValues = z.infer<typeof profileSchema>
 
@@ -50,12 +52,13 @@ function ProfileForm({ seller }: { seller: Seller }) {
       phone: seller.phone,
       location: seller.location ?? "",
       description: seller.description ?? "",
+      logoUrl: seller.logo_url ?? undefined,
     },
   })
   const errors = form.formState.errors
 
   const mutation = useMutation({
-    mutationFn: (values: ProfileValues) => api.patch("/seller/profile", values),
+    mutationFn: (values: ProfileValues) => api.patch("/seller/profile", { ...values, logoUrl: values.logoUrl ?? "" }),
     onSuccess: () => {
       toast.success("Profile updated.")
       queryClient.invalidateQueries({ queryKey: ["seller"] })
@@ -91,6 +94,13 @@ function ProfileForm({ seller }: { seller: Seller }) {
           <Textarea rows={3} {...form.register("description")} />
         </FormField>
       </div>
+      <FileUploadField
+        label="Logo (optional)"
+        helpText="JPEG, PNG, or WebP. A square image works best; it's shown uncropped on white."
+        folder="market-images"
+        value={form.watch("logoUrl")}
+        onChange={(url) => form.setValue("logoUrl", url, { shouldDirty: true })}
+      />
       <Button type="submit" className="w-fit" disabled={mutation.isPending}>
         {mutation.isPending ? "Saving..." : "Save Profile"}
       </Button>

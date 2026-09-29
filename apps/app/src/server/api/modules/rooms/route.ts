@@ -1,20 +1,20 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import { AppError } from "../../middleware/error-handler.js";
 import { createRoomSchema, listRoomsQuerySchema, updateRoomSchema } from "./schema.js";
 import * as service from "./service.js";
 
 export const roomsRoute = new Hono()
-  .use("*", requireAdminRole(ANY_ADMIN))
-  .get("/", zValidator("query", listRoomsQuerySchema), async (c) => {
+  .get("/", requirePermission("rooms", "view"), zValidator("query", listRoomsQuerySchema), async (c) => {
     const result = await service.listRooms(c.req.valid("query"));
     return c.json(result);
   })
-  .get("/:id", async (c) => {
+  .get("/:id", requirePermission("rooms", "view"), async (c) => {
     const room = await service.getRoom(Number(c.req.param("id")));
     return c.json({ room });
   })
+  .use("*", requirePermission("rooms", "manage"))
   .post("/", zValidator("json", createRoomSchema), async (c) => {
     const room = await service.createRoom(c.req.valid("json"));
     return c.json({ room }, 201);

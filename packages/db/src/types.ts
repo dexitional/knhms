@@ -1,4 +1,4 @@
-export type AdminRole = "super_admin" | "admin" | "staff" | "tutor" | "technician";
+export type AdminRole = "super_admin" | "admin" | "staff" | "tutor" | "technician" | "stores" | "supervisor" | "editor";
 
 export interface AdminRow {
   id: number;
@@ -232,6 +232,7 @@ export interface SellerRow {
   phone: string;
   location: string | null;
   description: string | null;
+  logo_url: string | null;
   password_hash: string;
   status: SellerStatus;
   status_reason: string | null;
@@ -239,6 +240,8 @@ export interface SellerRow {
   reviewed_at: string | null;
   registration_paid_at: string | null;
   paid_until: string | null;
+  registration_fee_waived: 0 | 1;
+  monthly_fee_waived: 0 | 1;
   failed_login_attempts: number;
   locked_until: string | null;
   created_at: string;
@@ -286,4 +289,122 @@ export interface HubPostRow {
   created_by: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export type FreshmenTopicLayout = "text" | "steps" | "cards";
+
+// One entry in a topic's steps timeline or icon-card grid.
+export interface FreshmenTopicItem {
+  title: string;
+  note?: string | null;
+  icon?: string | null;
+}
+
+export interface FreshmenGuideRow {
+  id: number;
+  title: string;
+  summary: string | null;
+  icon: string;
+  image_url: string | null;
+  sort_order: number;
+  is_published: 0 | 1;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FreshmenSectionRow {
+  id: number;
+  guide_id: number;
+  title: string;
+  intro: string | null;
+  image_url: string | null;
+  is_mandatory: 0 | 1;
+  sort_order: number;
+  is_published: 0 | 1;
+  created_at: string;
+  updated_at: string;
+}
+
+// items is a JSON column; mysql2 parses it into an array.
+export interface FreshmenTopicRow {
+  id: number;
+  section_id: number;
+  title: string;
+  body: string | null;
+  layout: FreshmenTopicLayout;
+  items: FreshmenTopicItem[] | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface FreshmenFaqRow {
+  id: number;
+  question: string;
+  answer: string;
+  sort_order: number;
+  is_published: 0 | 1;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InventoryCategoryRow {
+  id: number;
+  name: string;
+  description: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InventoryItemRow {
+  id: number;
+  name: string;
+  description: string | null;
+  category_id: number | null;
+  quantity: number;
+  min_quantity: number;
+  is_active: 0 | 1;
+  created_by: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export type InventoryRequestStatus = "pending" | "approved" | "rejected" | "released" | "cancelled";
+
+export interface InventoryRequestRow {
+  id: number;
+  requested_by: number | null;
+  purpose: string;
+  status: InventoryRequestStatus;
+  decision_note: string | null;
+  approved_by: number | null;
+  approved_at: string | null;
+  rejected_by: number | null;
+  rejected_at: string | null;
+  released_by: number | null;
+  released_at: string | null;
+  cancelled_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InventoryRequestItemRow {
+  id: number;
+  request_id: number;
+  item_id: number;
+  quantity: number;
+}
+
+export type InventoryMovementReason = "opening" | "restock" | "adjustment" | "release";
+
+export interface InventoryMovementRow {
+  id: number;
+  item_id: number;
+  quantity_change: number;
+  quantity_after: number;
+  reason: InventoryMovementReason;
+  note: string | null;
+  request_id: number | null;
+  admin_id: number | null;
+  created_at: string;
 }

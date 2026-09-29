@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import { createDirectoryEntrySchema, updateDirectoryEntrySchema } from "./schema.js";
 import * as service from "./service.js";
 
@@ -10,15 +10,15 @@ export const directoryRoute = new Hono()
     const entries = await service.listActiveEntries();
     return c.json({ entries });
   })
-  .get("/", requireAdminRole(ANY_ADMIN), async (c) => {
+  .get("/", requirePermission("yellowPages", "view"), async (c) => {
     const entries = await service.listEntries();
     return c.json({ entries });
   })
-  .get("/:id", requireAdminRole(ANY_ADMIN), async (c) => {
+  .get("/:id", requirePermission("yellowPages", "view"), async (c) => {
     const entry = await service.getEntry(Number(c.req.param("id")));
     return c.json({ entry });
   })
-  .use("*", requireAdminRole(ADMIN_ONLY))
+  .use("*", requirePermission("yellowPages", "manage"))
   .post("/", zValidator("json", createDirectoryEntrySchema), async (c) => {
     const entry = await service.createEntry(c.req.valid("json"));
     return c.json({ entry }, 201);

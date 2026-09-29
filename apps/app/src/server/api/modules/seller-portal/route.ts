@@ -9,12 +9,17 @@ import {
   updateSellerVendorSchema,
 } from "./schema.js";
 import * as service from "./service.js";
+import { analyticsQuerySchema } from "../analytics/schema.js";
+import { getSellerAnalytics } from "../analytics/service.js";
 
 // Everything a signed-in seller manages about their own account. Ownership
 // and account-type checks live in the service.
 export const sellerPortalRoute = new Hono()
   .use("*", requireSeller)
   .get("/overview", async (c) => c.json(await service.getOverview(c.get("seller").id)))
+  .get("/analytics", zValidator("query", analyticsQuerySchema), async (c) =>
+    c.json(await getSellerAnalytics(c.get("seller"), c.req.valid("query").days)),
+  )
   .patch("/profile", zValidator("json", updateSellerProfileSchema), async (c) =>
     c.json({ seller: await service.updateProfile(c.get("seller"), c.req.valid("json")) }),
   )

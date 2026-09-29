@@ -1,12 +1,13 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { CircleAlert, Clock, CreditCard, LayoutDashboard, LogOut, Package, UserCog, UtensilsCrossed } from "lucide-react"
+import { BarChart3, CircleAlert, Clock, CreditCard, LayoutDashboard, LogOut, Package, UserCog, UtensilsCrossed } from "lucide-react"
 import { getSellerSession } from "#/server/session"
 import { api } from "#/lib/api-client"
 import { asset } from "#/lib/asset"
 import { SELLER_TYPE_LABELS, sellerOverviewQuery } from "#/lib/sellers"
 import type { Seller } from "#/lib/sellers"
 import { Button } from "#/components/ui/button.tsx"
+import { SellerLogo } from "#/components/seller-logo"
 
 export const Route = createFileRoute("/seller/_seller")({
   beforeLoad: async () => {
@@ -22,12 +23,14 @@ function SellerLayout() {
   const navigate = useNavigate()
   const { data } = useQuery(sellerOverviewQuery)
   const status = data?.seller.status ?? seller.status
+  const businessName = data?.seller.business_name ?? seller.businessName
 
   const navItems = [
     { to: "/seller", label: "Dashboard", icon: LayoutDashboard, exact: true },
     seller.sellerType === "business"
       ? { to: "/seller/products", label: "My Products", icon: Package, exact: false }
       : { to: "/seller/menu", label: "My Menu", icon: UtensilsCrossed, exact: false },
+    { to: "/seller/analytics", label: "Analytics", icon: BarChart3, exact: false },
     { to: "/seller/billing", label: "Billing", icon: CreditCard, exact: false },
     { to: "/seller/account", label: "Account", icon: UserCog, exact: false },
   ] as const
@@ -61,9 +64,12 @@ function SellerLayout() {
           ))}
         </nav>
         <div className="border-t border-border p-3">
-          <div className="mb-2 px-3 text-xs text-muted-foreground">
-            <p className="font-semibold text-foreground">{seller.businessName}</p>
-            <p>{SELLER_TYPE_LABELS[seller.sellerType]}</p>
+          <div className="mb-2 flex items-center gap-3 px-3 text-xs text-muted-foreground">
+            <SellerLogo logoUrl={data?.seller.logo_url ?? null} name={businessName} className="size-10" />
+            <div className="min-w-0">
+              <p className="truncate font-semibold text-foreground">{businessName}</p>
+              <p>{SELLER_TYPE_LABELS[seller.sellerType]}</p>
+            </div>
           </div>
           <Button variant="outline" size="sm" className="w-full" onClick={handleLogout}>
             <LogOut className="size-4" />
@@ -75,9 +81,12 @@ function SellerLayout() {
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex flex-col gap-2 border-b border-border bg-card px-4 py-3 sm:hidden">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <img src={asset("logo.png")} alt="" className="h-7 w-auto" />
-              <span className="text-sm font-bold">KNH Seller</span>
+            <div className="flex min-w-0 items-center gap-2">
+              <SellerLogo logoUrl={data?.seller.logo_url ?? null} name={businessName} className="size-8" />
+              <div className="min-w-0 leading-tight">
+                <p className="truncate text-sm font-bold">{businessName}</p>
+                <p className="text-[0.7rem] tracking-widest text-primary uppercase">KNH Seller</p>
+              </div>
             </div>
             <Button variant="ghost" size="icon-sm" onClick={handleLogout} aria-label="Log out">
               <LogOut className="size-4" />

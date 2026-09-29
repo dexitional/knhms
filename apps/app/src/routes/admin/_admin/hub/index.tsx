@@ -39,6 +39,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '#/components/ui/dialog.tsx'
+import { canManage } from '#/lib/permissions'
+import { Pagination } from '#/components/pagination'
+
+const PAGE_SIZE = 15
 
 export const Route = createFileRoute('/admin/_admin/hub/')({
   component: HubAdminPage,
@@ -116,10 +120,11 @@ function today() {
 
 function HubAdminPage() {
   const { admin } = Route.useRouteContext()
-  const canEdit = admin.role === 'super_admin' || admin.role === 'admin'
+  const canEdit = canManage(admin.role, 'hub')
   const queryClient = useQueryClient()
   const [tab, setTab] = useState<PostType>('spotlight')
   const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
   const [dialog, setDialog] = useState<{ editing: HubPost | null } | null>(null)
 
   const { data, isLoading } = useQuery({
@@ -156,6 +161,9 @@ function HubAdminPage() {
           f?.toLowerCase().includes(query),
         )),
   )
+  // Stay on a real page when filtering or deleting shrinks the list.
+  const currentPage = Math.min(page, Math.max(1, Math.ceil(visible.length / PAGE_SIZE)))
+  const pageItems = visible.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
   const isPastEvent = (p: HubPost) =>
     p.type === 'event' && (p.event_end ?? p.event_start ?? '') < today()
 
@@ -189,7 +197,10 @@ function HubAdminPage() {
               type="button"
               role="tab"
               aria-selected={tab === t.type}
-              onClick={() => setTab(t.type)}
+              onClick={() => {
+                setTab(t.type)
+                setPage(1)
+              }}
               className={cn(
                 'rounded-md px-4 py-1.5 text-sm font-medium transition-colors',
                 tab === t.type
@@ -210,7 +221,10 @@ function HubAdminPage() {
             <Input
               placeholder="Search..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value)
+                setPage(1)
+              }}
               className="pl-8"
             />
           </div>
@@ -252,7 +266,7 @@ function HubAdminPage() {
                 </TableCell>
               </TableRow>
             )}
-            {visible.map((p) => (
+            {pageItems.map((p) => (
               <TableRow key={p.id}>
                 <TableCell>
                   <div className="flex items-center gap-3">
@@ -267,7 +281,7 @@ function HubAdminPage() {
                         <ImageIcon className="size-4" />
                       </div>
                     )}
-                    <p className="line-clamp-2 max-w-80 font-medium text-foreground">
+                    <p className="max-w-96 min-w-48 font-medium break-words text-foreground">
                       {p.title}
                     </p>
                   </div>
@@ -371,6 +385,14 @@ function HubAdminPage() {
             ))}
           </TableBody>
         </Table>
+        {visible.length > PAGE_SIZE && (
+          <Pagination
+            page={currentPage}
+            pageSize={PAGE_SIZE}
+            total={visible.length}
+            onPageChange={setPage}
+          />
+        )}
       </div>
 
       {dialog && (

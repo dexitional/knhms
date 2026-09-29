@@ -13,6 +13,8 @@
     "db:seed-market": "tsx scripts/seed-market.ts",
     "db:seed-food": "tsx scripts/seed-food.ts",
     "db:seed-hub": "tsx scripts/seed-hub.ts",
+    "db:seed-freshmen": "tsx scripts/seed-freshmen.ts",
+    "db:seed-inventory": "tsx scripts/seed-inventory.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

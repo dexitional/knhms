@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import * as service from "./service.js";
 import { z } from "zod";
 
@@ -16,18 +16,17 @@ const listRepairsReportQuerySchema = z.object({
 });
 
 export const reportsRoute = new Hono()
-  .use("*", requireAdminRole(ANY_ADMIN))
-  .get("/students", zValidator("query", listStudentsReportQuerySchema), async (c) => {
+  .get("/students", requirePermission("reports", "view"), zValidator("query", listStudentsReportQuerySchema), async (c) => {
     const query = c.req.valid("query");
     const result = await service.getStudentsReport(query);
     return c.json(result);
   })
-  .get("/repairs", zValidator("query", listRepairsReportQuerySchema), async (c) => {
+  .get("/repairs", requirePermission("reports", "view"), zValidator("query", listRepairsReportQuerySchema), async (c) => {
     const query = c.req.valid("query");
     const report = await service.getRepairsReport(query);
     return c.json(report);
   })
-  .get("/overview", async (c) => {
+  .get("/overview", requirePermission("overview", "view"), async (c) => {
     const overview = await service.getOverview();
     return c.json(overview);
   });

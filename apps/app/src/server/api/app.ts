@@ -23,6 +23,9 @@ import { sellersRoute } from "./modules/sellers/route.js";
 import { sellerAuthRoute } from "./modules/seller-auth/route.js";
 import { sellerPortalRoute } from "./modules/seller-portal/route.js";
 import { hubRoute } from "./modules/hub/route.js";
+import { freshmenRoute } from "./modules/freshmen/route.js";
+import { inventoryRoute } from "./modules/inventory/route.js";
+import { analyticsRoute } from "./modules/analytics/route.js";
 
 const app = new Hono();
 
@@ -49,6 +52,9 @@ app.route("/sellers", sellersRoute);
 app.route("/seller-auth", sellerAuthRoute);
 app.route("/seller", sellerPortalRoute);
 app.route("/hub", hubRoute);
+app.route("/freshmen", freshmenRoute);
+app.route("/inventory", inventoryRoute);
+app.route("/analytics", analyticsRoute);
 
 export type AppType = typeof app;
 export { app as apiApp };

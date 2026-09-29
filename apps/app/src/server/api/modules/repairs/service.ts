@@ -49,10 +49,19 @@ export async function updateStudentRemarks(id: number, studentId: number, input:
   return getRepairRequest(id);
 }
 
-export async function listRepairRequests(query: ListQuery) {
+// assignedTo limits results to one admin's assignments (technicians).
+interface RepairScope {
+  assignedTo?: number;
+}
+
+export async function listRepairRequests(query: ListQuery, scope: RepairScope = {}) {
   const pool = getPool();
   const conditions: string[] = [];
   const params: any[] = [];
+  if (scope.assignedTo !== undefined) {
+    conditions.push("rr.assigned_admin_id = ?");
+    params.push(scope.assignedTo);
+  }
   if (query.status) {
     conditions.push("rr.status = ?");
     params.push(query.status);
@@ -77,7 +86,7 @@ export async function listRepairRequests(query: ListQuery) {
   return { items: rows, total: Number(countRows[0]?.total ?? 0), page: query.page, pageSize: query.pageSize };
 }
 
-export async function getRepairRequest(id: number) {
+export async function getRepairRequest(id: number, scope: RepairScope = {}) {
   const pool = getPool();
   const [rows] = await pool.execute<RowDataPacket[]>(
     `SELECT rr.*, r.room_number, s.full_name AS student_name, s.registration_number,
@@ -90,7 +99,9 @@ export async function getRepairRequest(id: number) {
     [id],
   );
   const row = rows[0];
-  if (!row) throw new AppError("Repair request not found.", 404);
+  if (!row || (scope.assignedTo !== undefined && row.assigned_admin_id !== scope.assignedTo)) {
+    throw new AppError("Repair request not found.", 404);
+  }
   return row;
 }
 

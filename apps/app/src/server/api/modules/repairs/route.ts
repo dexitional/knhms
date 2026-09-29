@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole, requireStudent } from "../../middleware/require-auth.js";
+import { requirePermission, requireStudent } from "../../middleware/require-auth.js";
+import { seesOnlyAssignedRepairs } from "#/lib/permissions";
 import {
   createRepairRequestSchema,
   listRepairsQuerySchema,
@@ -33,17 +34,24 @@ export const repairsRoute = new Hono()
     },
   )
 
-  .get("/", requireAdminRole(ANY_ADMIN), zValidator("query", listRepairsQuerySchema), async (c) => {
-    const result = await service.listRepairRequests(c.req.valid("query"));
+  // Technicians only ever see the requests assigned to them.
+  .get("/", requirePermission("repairs", "view"), zValidator("query", listRepairsQuerySchema), async (c) => {
+    const admin = c.get("admin");
+    const result = await service.listRepairRequests(c.req.valid("query"), {
+      assignedTo: seesOnlyAssignedRepairs(admin.role) ? admin.id : undefined,
+    });
     return c.json(result);
   })
-  .get("/:id", requireAdminRole(ANY_ADMIN), async (c) => {
-    const request = await service.getRepairRequest(Number(c.req.param("id")));
+  .get("/:id", requirePermission("repairs", "view"), async (c) => {
+    const admin = c.get("admin");
+    const request = await service.getRepairRequest(Number(c.req.param("id")), {
+      assignedTo: seesOnlyAssignedRepairs(admin.role) ? admin.id : undefined,
+    });
     return c.json({ request });
   })
   .patch(
     "/:id",
-    requireAdminRole(ADMIN_ONLY),
+    requirePermission("repairs", "manage"),
     zValidator("json", updateRepairAdminSchema),
     async (c) => {
       const request = await service.updateRepairRequest(Number(c.req.param("id")), c.req.valid("json"));

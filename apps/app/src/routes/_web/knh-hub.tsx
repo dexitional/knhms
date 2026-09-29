@@ -158,6 +158,53 @@ function KnhHubPage() {
       <DecorativeBackground />
       <FeaturedCarousel slides={featuredSlides} />
 
+      {news.length > 0 && (
+        <section
+          aria-labelledby="news-heading"
+          className="relative overflow-hidden bg-gradient-to-b from-card via-secondary/60 to-card py-16 sm:py-20"
+        >
+          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2
+                id="news-heading"
+                className="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
+              >
+                Latest News
+              </h2>
+              <p className="mt-2 text-base leading-7 text-muted-foreground md:mt-4 md:text-lg md:leading-8">
+                Stay informed with the latest news and updates from Kwame
+                Nkrumah Hall
+              </p>
+            </div>
+            <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
+              {visibleNews.map((item) => (
+                <NewsCard
+                  key={item.id}
+                  item={item}
+                  onOpen={() => setReading(toReading(item))}
+                />
+              ))}
+            </div>
+            {news.length > NEWS_PREVIEW_COUNT && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setShowAllNews((v) => !v)}
+                  aria-expanded={showAllNews}
+                  className="group inline-flex items-center gap-2 rounded-full bg-foreground px-5 py-2.5 text-sm font-semibold text-background shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-foreground/90 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
+                >
+                  {showAllNews ? 'Show Less' : 'View All News'}
+                  <ArrowRight
+                    className={`size-4 transition-transform duration-300 ${showAllNews ? '-rotate-90' : 'group-hover:translate-x-1'}`}
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {announcements.length > 0 && (
         <section
           aria-labelledby="announcements-heading"
@@ -188,53 +235,6 @@ function KnhHubPage() {
                 />
               ))}
             </div>
-          </div>
-        </section>
-      )}
-
-      {news.length > 0 && (
-        <section
-          aria-labelledby="news-heading"
-          className="relative overflow-hidden bg-gradient-to-b from-card via-secondary/60 to-card py-16 sm:py-20"
-        >
-          <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="mx-auto max-w-2xl text-center">
-              <h2
-                id="news-heading"
-                className="text-2xl font-bold tracking-tight text-foreground md:text-4xl"
-              >
-                Latest News
-              </h2>
-              <p className="mt-2 text-base leading-7 text-muted-foreground md:mt-4 md:text-lg md:leading-8">
-                Stay informed with the latest news and updates from Kwame
-                Nkrumah Hall
-              </p>
-            </div>
-            <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-8 lg:mx-0 lg:max-w-none lg:grid-cols-3">
-              {visibleNews.map((item) => (
-                <NewsCard
-                  key={item.id}
-                  item={item}
-                  onOpen={() => setReading(toReading(item))}
-                />
-              ))}
-            </div>
-            {news.length > NEWS_PREVIEW_COUNT && (
-              <div className="mt-12 flex justify-center">
-                <button
-                  type="button"
-                  onClick={() => setShowAllNews((v) => !v)}
-                  aria-expanded={showAllNews}
-                  className="group inline-flex items-center gap-3 rounded-full bg-foreground px-8 py-4 text-base font-semibold text-background shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-foreground/90 hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-foreground"
-                >
-                  {showAllNews ? 'Show Less' : 'View All News'}
-                  <ArrowRight
-                    className={`size-5 transition-transform duration-300 ${showAllNews ? '-rotate-90' : 'group-hover:translate-x-1'}`}
-                    aria-hidden="true"
-                  />
-                </button>
-              </div>
-            )}
           </div>
         </section>
       )}

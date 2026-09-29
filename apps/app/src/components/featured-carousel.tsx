@@ -121,8 +121,8 @@ export function FeaturedCarousel({
                   : 'pointer-events-none z-0 opacity-0',
               )}
             >
-              <div className="absolute bottom-0 z-10 w-full md:w-[70%] lg:w-[60%]">
-                <div className="flex flex-col items-start rounded-tr-lg bg-gradient-to-t from-(--caption-tint)/95 via-(--caption-tint)/90 to-transparent py-3 pr-4 pl-4 sm:py-4 sm:pr-5 sm:pl-8 lg:pl-20">
+              <div className="absolute bottom-0 left-1/2 z-10 w-full -translate-x-1/2 md:w-[70%] lg:w-[60%]">
+                <div className="flex flex-col items-start bg-gradient-to-t md:rounded-t-lg from-(--caption-tint)/95 via-(--caption-tint)/90 to-transparent px-4 py-3 sm:px-8 sm:py-4 lg:px-12">
                   <div className="flex items-stretch justify-between gap-5 max-md:ml-2.5">
                     {slide.category &&
                       (slide.categoryHref ? (
@@ -182,8 +182,8 @@ export function FeaturedCarousel({
 
       {count > 1 && (
         <>
-          {/* Right-aligned navigation + play controls */}
-          <div className="absolute right-5 bottom-7 z-10 sm:bottom-16">
+          {/* Navigation + play controls, top-right so they stay clear of the centred caption */}
+          <div className="absolute top-5 right-5 z-10">
             <div className="hidden items-center gap-4 md:flex lg:gap-8">
               <button
                 type="button"

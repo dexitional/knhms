@@ -83,7 +83,7 @@ export async function getPublicCatalog() {
     `SELECT * FROM market_categories WHERE is_active = 1 ${CATEGORY_ORDER}`,
   );
   const [products] = await pool.query<RowDataPacket[]>(
-    `SELECT p.* FROM market_products p
+    `SELECT p.*, s.logo_url AS seller_logo_url FROM market_products p
      JOIN market_categories c ON c.id = p.category_id
      LEFT JOIN sellers s ON s.id = p.seller_id
      WHERE p.is_active = 1 AND c.is_active = 1
@@ -92,7 +92,10 @@ export async function getPublicCatalog() {
   );
   return {
     categories: categories.map((c): MarketCategoryRow => ({ ...c })),
-    products: products.map(toProduct),
+    products: products.map((row) => ({
+      ...toProduct(row),
+      seller_logo_url: (row.seller_logo_url as string | null) ?? null,
+    })),
   };
 }
 

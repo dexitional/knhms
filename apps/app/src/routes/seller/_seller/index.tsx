@@ -1,7 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
-import { ArrowRight, ExternalLink, Package, UtensilsCrossed } from "lucide-react"
-import { STATUS_BADGE, STATUS_LABELS, SELLER_TYPE_LABELS, formatDate, sellerOverviewQuery } from "#/lib/sellers"
+import { ArrowRight, BarChart3, ExternalLink, Eye, MousePointerClick, Package, UtensilsCrossed } from "lucide-react"
+import {
+  STATUS_BADGE,
+  STATUS_LABELS,
+  SELLER_TYPE_LABELS,
+  formatDate,
+  sellerAnalyticsQuery,
+  sellerOverviewQuery,
+} from "#/lib/sellers"
 import { BillingSummaryCard } from "#/components/seller-billing"
 import { Badge } from "#/components/ui/badge.tsx"
 import { Button } from "#/components/ui/button.tsx"
@@ -13,6 +20,7 @@ export const Route = createFileRoute("/seller/_seller/")({
 function SellerDashboard() {
   const { seller: session } = Route.useRouteContext()
   const { data, isLoading } = useQuery(sellerOverviewQuery)
+  const analytics = useQuery(sellerAnalyticsQuery(7))
   const isBusiness = session.sellerType === "business"
 
   if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>
@@ -50,6 +58,32 @@ function SellerDashboard() {
         <div className="lg:col-span-2">
           <BillingSummaryCard billing={billing} />
         </div>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-x-8 gap-y-3 rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-blue-500/10 text-blue-600">
+            <Eye className="size-5" />
+          </span>
+          <div>
+            <p className="text-2xl font-bold">{analytics.data?.totals.views ?? "—"}</p>
+            <p className="text-sm text-muted-foreground">Views, last 7 days</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="flex size-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <MousePointerClick className="size-5" />
+          </span>
+          <div>
+            <p className="text-2xl font-bold">{analytics.data?.totals.clicks ?? "—"}</p>
+            <p className="text-sm text-muted-foreground">Order clicks, last 7 days</p>
+          </div>
+        </div>
+        <Button asChild variant="outline" size="sm" className="ml-auto w-fit">
+          <Link to="/seller/analytics">
+            <BarChart3 className="size-4" /> View analytics
+          </Link>
+        </Button>
       </div>
 
       {seller.status === "approved" && (

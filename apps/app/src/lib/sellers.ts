@@ -17,11 +17,14 @@ export interface Seller {
   phone: string;
   location: string | null;
   description: string | null;
+  logo_url: string | null;
   status: SellerStatus;
   status_reason: string | null;
   reviewed_at: string | null;
   registration_paid_at: string | null;
   paid_until: string | null;
+  registration_fee_waived: 0 | 1;
+  monthly_fee_waived: 0 | 1;
   created_at: string;
 }
 
@@ -29,6 +32,8 @@ export interface BillingSummary {
   registrationFee: number;
   monthlyFee: number;
   registrationPaid: boolean;
+  registrationWaived: boolean;
+  monthlyWaived: boolean;
   paidUntil: string | null;
   state: BillingState;
   daysOverdue: number;
@@ -119,3 +124,27 @@ export const sellerOverviewQuery = {
   queryKey: ["seller", "overview"],
   queryFn: () => api.get<SellerOverview>("/seller/overview"),
 };
+
+// ---- Analytics ----------------------------------------------------------------
+
+export type AnalyticsRange = 7 | 30 | 90;
+
+export interface AnalyticsTotals {
+  views: number;
+  clicks: number;
+  whatsapp: number;
+  calls: number;
+}
+
+export interface SellerAnalytics {
+  range: { days: AnalyticsRange; from: string; to: string };
+  totals: AnalyticsTotals;
+  previous: AnalyticsTotals;
+  daily: Array<{ date: string; views: number; clicks: number }>;
+  listings: Array<{ id: number; name: string; image_url: string | null; views: number; whatsapp: number; calls: number }>;
+}
+
+export const sellerAnalyticsQuery = (days: AnalyticsRange) => ({
+  queryKey: ["seller", "analytics", days],
+  queryFn: () => api.get<SellerAnalytics>("/seller/analytics", { days }),
+});

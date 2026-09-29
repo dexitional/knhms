@@ -11,6 +11,7 @@ export const updateSellerProfileSchema = z
     phone: ghanaPhoneSchema,
     location: optionalField(z.string().trim().max(255)),
     description: optionalField(z.string().trim().max(500)),
+    logoUrl: optionalField(z.url({ protocol: /^https?$/ }).max(500)),
   })
   .partial();
 
@@ -35,7 +36,7 @@ export const createSellerProductSchema = sellerProductFields.refine(
 
 export const updateSellerProductSchema = sellerProductFields.partial();
 
-// Vendor name/phone/location come from the seller profile.
+// Vendor name/phone/location and logo come from the seller profile.
 export const updateSellerVendorSchema = createVendorSchema
-  .pick({ cuisine: true, description: true, logoUrl: true, openingHours: true, delivers: true, isOpen: true })
+  .pick({ cuisine: true, description: true, openingHours: true, delivers: true, isOpen: true })
   .partial();

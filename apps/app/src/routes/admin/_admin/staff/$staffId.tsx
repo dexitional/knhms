@@ -67,7 +67,7 @@ function StaffDetailPage() {
   const updateMutation = useMutation({
     mutationFn: (values: EditableValues) => api.patch(`/admins/${staffId}`, values),
     onSuccess: () => {
-      toast.success("Staff account updated.");
+      toast.success("User account updated.");
       queryClient.invalidateQueries({ queryKey: ["admins"] });
     },
     onError: (err) => toast.error(err instanceof ApiError ? err.message : "Couldn't update account."),
@@ -76,13 +76,13 @@ function StaffDetailPage() {
   const deactivateMutation = useMutation({
     mutationFn: () => api.delete(`/admins/${staffId}`),
     onSuccess: () => {
-      toast.success("Staff account deactivated.");
+      toast.success("User account deactivated.");
       navigate({ to: "/admin/staff" });
     },
   });
 
   if (currentAdmin.role !== "super_admin") {
-    return <p className="text-muted-foreground">Only super admins can manage staff accounts.</p>;
+    return <p className="text-muted-foreground">Only super admins can manage user accounts.</p>;
   }
   if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>;
 
@@ -91,7 +91,7 @@ function StaffDetailPage() {
       <Button asChild variant="ghost" size="sm" className="w-fit">
         <Link to="/admin/staff">
           <ArrowLeft className="size-4" />
-          Back to Staff
+          Back to Users
         </Link>
       </Button>
 
@@ -125,6 +125,9 @@ function StaffDetailPage() {
                         <SelectItem value="staff">Staff</SelectItem>
                         <SelectItem value="tutor">Tutor</SelectItem>
                         <SelectItem value="technician">Technician</SelectItem>
+                        <SelectItem value="stores">Stores</SelectItem>
+                        <SelectItem value="supervisor">Supervisor</SelectItem>
+                        <SelectItem value="editor">Editor</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="super_admin">Super Admin</SelectItem>
                       </SelectContent>

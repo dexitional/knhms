@@ -1,6 +1,8 @@
 import type { Context, Next } from "hono";
 import { getCookie } from "hono/cookie";
 import type { AdminRole } from "@knh/db";
+import { rolesWith } from "#/lib/permissions";
+import type { Access, AdminModule } from "#/lib/permissions";
 import { ADMIN_SESSION_COOKIE, SELLER_SESSION_COOKIE, STUDENT_SESSION_COOKIE } from "#/server/session";
 import {
   getAdminSessionUser,
@@ -54,6 +56,12 @@ export function requireAdminRole(allowed: AdminRole[]) {
   };
 }
 
-export const ANY_ADMIN: AdminRole[] = ["super_admin", "admin", "staff", "tutor", "technician"];
+export const ANY_ADMIN: AdminRole[] = ["super_admin", "admin", "staff", "tutor", "technician", "stores", "supervisor", "editor"];
 export const ADMIN_ONLY: AdminRole[] = ["super_admin", "admin"];
 export const SUPER_ADMIN_ONLY: AdminRole[] = ["super_admin"];
+
+// Guards a route by the role matrix in lib/permissions.ts: "view" for reads,
+// "manage" for anything that changes data.
+export function requirePermission(module: AdminModule, level: Access) {
+  return requireAdminRole(rolesWith(module, level));
+}

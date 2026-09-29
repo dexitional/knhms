@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "#/components/ui/select.tsx"
 import { Pagination } from "#/components/pagination"
+import { canManage } from "#/lib/permissions"
 
 export const Route = createFileRoute("/admin/_admin/orders/")({
   component: AdminOrdersPage,
@@ -42,6 +43,8 @@ const EDITABLE_STATUSES = ["pending", "processing", "completed", "cancelled"] as
 const PAGE_SIZE = 20
 
 function AdminOrdersPage() {
+  const { admin } = Route.useRouteContext()
+  const canEdit = canManage(admin.role, "orders")
   const [page, setPage] = useState(1)
   const [status, setStatus] = useState<(typeof STATUSES)[number]>("all")
   const [search, setSearch] = useState("")
@@ -127,6 +130,7 @@ function AdminOrdersPage() {
                 <TableCell>
                   <Select
                     value={order.status}
+                    disabled={!canEdit}
                     onValueChange={(v) => updateMutation.mutate({ id: order.id, newStatus: v })}
                   >
                     <SelectTrigger size="sm" className="w-36">

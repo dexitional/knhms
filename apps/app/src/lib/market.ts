@@ -47,3 +47,19 @@ export function discountPercent(price: number, oldPrice: number | null) {
   if (oldPrice == null || oldPrice <= price) return 0;
   return Math.round(((oldPrice - price) / oldPrice) * 100);
 }
+
+// ---- Admin analytics (server/api/modules/analytics) -----------------------------
+
+export interface ListingStats {
+  views: number;
+  whatsapp: number;
+  calls: number;
+}
+
+export interface MarketAnalytics {
+  range: { days: 7 | 30 | 90; from: string; to: string };
+  totals: { views: number; clicks: number; whatsapp: number; calls: number };
+  previous: { views: number; clicks: number; whatsapp: number; calls: number };
+  products: Record<string, ListingStats>; // keyed by product id
+  vendors: Record<string, ListingStats>; // keyed by vendor id
+}

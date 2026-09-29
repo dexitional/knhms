@@ -5,7 +5,8 @@ import type { RowDataPacket } from "mysql2";
 // Billing model: a one-time registration fee, then a monthly fee once the
 // seller is approved. Payments are recorded by admins (MoMo/cash/bank);
 // each monthly payment extends `paid_until`. Overdue sellers are flagged,
-// never auto-suspended — admins decide.
+// never auto-suspended — admins decide. Admins may waive either fee for an
+// individual seller; a waived fee is never charged.
 
 export interface BillingSettings {
   businessRegistrationFee: number;
@@ -78,6 +79,8 @@ export interface BillingSummary {
   registrationFee: number;
   monthlyFee: number;
   registrationPaid: boolean;
+  registrationWaived: boolean;
+  monthlyWaived: boolean;
   paidUntil: string | null;
   state: BillingState;
   daysOverdue: number;
@@ -86,14 +89,31 @@ export interface BillingSummary {
 
 type BillableSeller = Pick<
   SellerRow,
-  "seller_type" | "status" | "registration_paid_at" | "paid_until" | "reviewed_at"
+  | "seller_type"
+  | "status"
+  | "registration_paid_at"
+  | "paid_until"
+  | "reviewed_at"
+  | "registration_fee_waived"
+  | "monthly_fee_waived"
 >;
 
 export function billingSummary(seller: BillableSeller, settings: BillingSettings): BillingSummary {
-  const { registrationFee, monthlyFee } = feesFor(settings, seller.seller_type);
-  // A zero fee counts as paid — admins may waive either fee.
-  const registrationPaid = seller.registration_paid_at != null || registrationFee === 0;
-  const base = { registrationFee, monthlyFee, registrationPaid, paidUntil: seller.paid_until };
+  const fees = feesFor(settings, seller.seller_type);
+  // A per-seller waiver, or a zero fee in settings, means nothing is charged.
+  const registrationWaived = seller.registration_fee_waived === 1 || fees.registrationFee === 0;
+  const monthlyWaived = seller.monthly_fee_waived === 1 || fees.monthlyFee === 0;
+  const registrationFee = registrationWaived ? 0 : fees.registrationFee;
+  const monthlyFee = monthlyWaived ? 0 : fees.monthlyFee;
+  const registrationPaid = seller.registration_paid_at != null || registrationWaived;
+  const base = {
+    registrationFee,
+    monthlyFee,
+    registrationPaid,
+    registrationWaived,
+    monthlyWaived,
+    paidUntil: seller.paid_until,
+  };
 
   if (seller.status === "rejected") {
     return { ...base, state: "not_applicable", daysOverdue: 0, amountDue: 0 };

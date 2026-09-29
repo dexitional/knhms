@@ -1,17 +1,17 @@
 import { Hono } from "hono";
 import { zValidator } from "@hono/zod-validator";
-import { ADMIN_ONLY, ANY_ADMIN, requireAdminRole } from "../../middleware/require-auth.js";
+import { requirePermission } from "../../middleware/require-auth.js";
 import { createHubPostSchema, hubPostTypeSchema, updateHubPostSchema } from "./schema.js";
 import * as service from "./service.js";
 
 // KNH Hub page content: spotlight slides, announcements, news, and events.
 export const hubRoute = new Hono()
   .get("/public", async (c) => c.json(await service.getPublicHub()))
-  .get("/posts", requireAdminRole(ANY_ADMIN), async (c) => {
+  .get("/posts", requirePermission("hub", "view"), async (c) => {
     const type = hubPostTypeSchema.safeParse(c.req.query("type"));
     return c.json({ posts: await service.listPosts(type.success ? type.data : undefined) });
   })
-  .use("*", requireAdminRole(ADMIN_ONLY))
+  .use("*", requirePermission("hub", "manage"))
   .post("/posts", zValidator("json", createHubPostSchema), async (c) =>
     c.json({ post: await service.createPost(c.get("admin").id, c.req.valid("json")) }, 201),
   )

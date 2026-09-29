@@ -63,10 +63,11 @@ const PROFILE_FIELDS: Record<string, string> = {
   phone: "phone",
   location: "location",
   description: "description",
+  logoUrl: "logo_url",
 };
 
 // Keeps the seller's copies in listings (product seller details, vendor
-// name/contact) in step with the profile.
+// name/contact/logo) in step with the profile.
 export async function updateProfile(seller: SellerSessionUser, input: ProfileInput) {
   const { columns, params } = toColumns(input, PROFILE_FIELDS);
   if (columns.length > 0) {
@@ -79,10 +80,11 @@ export async function updateProfile(seller: SellerSessionUser, input: ProfileInp
       [updated.business_name, updated.phone, updated.location, seller.id],
     );
   } else {
-    await getPool().execute("UPDATE food_vendors SET name = ?, phone = ?, location = ? WHERE seller_id = ?", [
+    await getPool().execute("UPDATE food_vendors SET name = ?, phone = ?, location = ?, logo_url = ? WHERE seller_id = ?", [
       updated.business_name,
       updated.phone,
       updated.location,
+      updated.logo_url,
       seller.id,
     ]);
   }
