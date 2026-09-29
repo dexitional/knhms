@@ -70,6 +70,7 @@ const PERMISSIONS: Record<AdminRole, Partial<Record<AdminModule, Access>>> = {
   editor: {
     hub: "manage",
     yellowPages: "manage",
+    market: "manage",
   },
   stores: {
     inventory: "view", // plus releasing approved requests (see below)
