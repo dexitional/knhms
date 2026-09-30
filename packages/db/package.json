@@ -15,6 +15,7 @@
     "db:seed-hub": "tsx scripts/seed-hub.ts",
     "db:seed-freshmen": "tsx scripts/seed-freshmen.ts",
     "db:seed-inventory": "tsx scripts/seed-inventory.ts",
+    "db:seed-alumni": "tsx scripts/seed-alumni.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

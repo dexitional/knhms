@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS alumni_memberships (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  full_name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NOT NULL,
+  phone VARCHAR(30) NOT NULL,
+  class_year VARCHAR(40) NOT NULL,
+  programme VARCHAR(150) NULL,
+  occupation VARCHAR(150) NULL,
+  employer VARCHAR(150) NULL,
+  location VARCHAR(150) NULL,
+  linkedin_url VARCHAR(500) NULL,
+  interests JSON NULL,
+  wants_updates TINYINT(1) NOT NULL DEFAULT 1,
+  status ENUM('new', 'contacted', 'archived') NOT NULL DEFAULT 'new',
+  notes VARCHAR(1000) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_alumni_memberships_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

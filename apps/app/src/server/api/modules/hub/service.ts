@@ -40,12 +40,16 @@ const PUBLIC_LIMITS = { spotlight: 5, announcement: 6, news: 12 } as const;
 
 // ---- Public ---------------------------------------------------------------
 
+// Posts in the "Alumni" category appear on the Alumni page, not the KNH Hub.
+const NOT_ALUMNI = "(category IS NULL OR LOWER(TRIM(category)) <> 'alumni')";
+const IS_ALUMNI = "LOWER(TRIM(category)) = 'alumni'";
+
 export async function getPublicHub() {
   const pool = getPool();
   const byType = (type: HubPostType, limit: number) =>
     pool
       .query<(HubPostRow & RowDataPacket)[]>(
-        `SELECT * FROM hub_posts WHERE type = ? AND is_published = 1
+        `SELECT * FROM hub_posts WHERE type = ? AND is_published = 1 AND ${NOT_ALUMNI}
          ORDER BY sort_order, published_on DESC, id DESC LIMIT ?`,
         [type, limit],
       )
@@ -55,7 +59,7 @@ export async function getPublicHub() {
   const eventsQuery = pool
     .query<(HubPostRow & RowDataPacket)[]>(
       `SELECT * FROM hub_posts
-       WHERE type = 'event' AND is_published = 1 AND COALESCE(event_end, event_start) >= CURDATE()
+       WHERE type = 'event' AND is_published = 1 AND COALESCE(event_end, event_start) >= CURDATE() AND ${NOT_ALUMNI}
        ORDER BY event_start, sort_order, id`,
     )
     .then(([rows]) => rows.map((r) => withRichBody({ ...r })));
@@ -67,6 +71,28 @@ export async function getPublicHub() {
     eventsQuery,
   ]);
   return { spotlights, announcements, news, events };
+}
+
+// The Alumni page's feed: published "Alumni" announcements (latest first)
+// and upcoming "Alumni" events (soonest first), managed in Admin → KNH Hub.
+export async function getAlumniHubPosts() {
+  const pool = getPool();
+  const [[announcements], [events]] = await Promise.all([
+    pool.query<(HubPostRow & RowDataPacket)[]>(
+      `SELECT * FROM hub_posts WHERE type = 'announcement' AND is_published = 1 AND ${IS_ALUMNI}
+       ORDER BY sort_order, published_on DESC, id DESC LIMIT ?`,
+      [PUBLIC_LIMITS.announcement],
+    ),
+    pool.query<(HubPostRow & RowDataPacket)[]>(
+      `SELECT * FROM hub_posts
+       WHERE type = 'event' AND is_published = 1 AND COALESCE(event_end, event_start) >= CURDATE() AND ${IS_ALUMNI}
+       ORDER BY event_start, sort_order, id`,
+    ),
+  ]);
+  return {
+    announcements: announcements.map((r) => withRichBody({ ...r })),
+    events: events.map((r) => withRichBody({ ...r })),
+  };
 }
 
 // ---- Admin -----------------------------------------------------------------

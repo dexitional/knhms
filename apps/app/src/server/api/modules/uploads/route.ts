@@ -20,6 +20,7 @@ const FOLDER_MODULES: Record<string, Array<AdminModule>> = {
   "directory-photos": ["yellowPages"],
   "hub-images": ["hub", "freshmen"],
   "market-images": ["market"],
+  "alumni-images": ["alumni"],
 };
 
 // Unlike every other admin-owned module, this endpoint must be reachable

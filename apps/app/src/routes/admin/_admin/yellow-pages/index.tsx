@@ -45,12 +45,13 @@ export const Route = createFileRoute("/admin/_admin/yellow-pages/")({
   component: YellowPagesAdminPage,
 })
 
-type Category = "personnel" | "business" | "executive" | "page_personnel"
+type Category = "personnel" | "business" | "executive" | "alumni" | "page_personnel"
 
 const CATEGORY_LABELS: Record<Category, string> = {
   personnel: "Key Personnel",
   business: "Campus Business",
   executive: "KNH Executive",
+  alumni: "Alumni",
   page_personnel: "Page Personnel",
 }
 
@@ -58,6 +59,7 @@ const CATEGORY_BADGE = {
   personnel: "secondary",
   business: "info",
   executive: "purple",
+  alumni: "success",
   page_personnel: "warning",
 } as const
 
@@ -71,30 +73,71 @@ interface DirectoryEntry {
   title: string
   subtitle: string | null
   phone: string | null
+  show_phone: 0 | 1
   email: string | null
   location: string | null
   hours: string | null
   photo_url: string | null
   map_query: string | null
   website_url: string | null
+  tags: string[] | null
   sort_order: number
   is_active: 0 | 1
+}
+
+const MAX_TAGS = 8
+
+// "Mentor, Class of 2015 ,mentor" → ["Mentor", "Class of 2015"]
+function parseTags(value: string) {
+  const seen = new Set<string>()
+  return value
+    .split(",")
+    .map((t) => t.trim())
+    .filter((t) => {
+      const key = t.toLowerCase()
+      if (!t || seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+}
+
+// Rounded tag badges, as on the public Yellow Pages cards.
+function TagBadges({ tags }: { tags: Array<string> }) {
+  if (tags.length === 0) return null
+  return (
+    <div className="flex flex-wrap gap-1">
+      {tags.map((t) => (
+        <span
+          key={t}
+          className="rounded-full border border-primary/20 bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary"
+        >
+          {t}
+        </span>
+      ))}
+    </div>
+  )
 }
 
 const optionalUrl = z.union([z.string().url("Enter a full URL, e.g. https://…"), z.literal("")])
 
 const entrySchema = z.object({
-  category: z.enum(["personnel", "business", "executive", "page_personnel"]),
+  category: z.enum(["personnel", "business", "executive", "alumni", "page_personnel"]),
   name: z.string().trim().min(2, "Required").max(150),
   title: z.string().trim().min(1, "Required").max(150),
   subtitle: z.string().max(255),
   phone: z.string().max(30),
+  showPhone: z.boolean(),
   email: z.union([z.string().email("Enter a valid email"), z.literal("")]),
   location: z.string().max(255),
   hours: z.string().max(150),
   photoUrl: optionalUrl.optional(),
   mapQuery: z.string().max(255),
   websiteUrl: optionalUrl,
+  // Comma-separated in the form; sent to the API as a list.
+  tags: z.string().refine((v) => parseTags(v).length <= MAX_TAGS, `Use at most ${MAX_TAGS} tags.`).refine(
+    (v) => parseTags(v).every((t) => t.length <= 30),
+    "Keep each tag to 30 characters.",
+  ),
   sortOrder: z.number().int().min(0).max(9999),
   isActive: z.boolean(),
 })
@@ -106,12 +149,14 @@ const EMPTY_FORM: EntryFormValues = {
   title: "",
   subtitle: "",
   phone: "",
+  showPhone: true,
   email: "",
   location: "",
   hours: "",
   photoUrl: undefined,
   mapQuery: "",
   websiteUrl: "",
+  tags: "",
   sortOrder: 0,
   isActive: true,
 }
@@ -123,12 +168,14 @@ function toFormValues(e: DirectoryEntry): EntryFormValues {
     title: e.title,
     subtitle: e.subtitle ?? "",
     phone: e.phone ?? "",
+    showPhone: e.show_phone === 1,
     email: e.email ?? "",
     location: e.location ?? "",
     hours: e.hours ?? "",
     photoUrl: e.photo_url ?? undefined,
     mapQuery: e.map_query ?? "",
     websiteUrl: e.website_url ?? "",
+    tags: (e.tags ?? []).join(", "),
     sortOrder: e.sort_order,
     isActive: e.is_active === 1,
   }
@@ -155,6 +202,7 @@ function YellowPagesAdminPage() {
   })
   const errors = form.formState.errors
   const isBusiness = form.watch("category") === "business"
+  const isAlumni = form.watch("category") === "alumni"
   const isAdminOnly = ADMIN_ONLY_CATEGORIES.has(form.watch("category"))
 
   const onSaved = (message: string) => {
@@ -168,7 +216,7 @@ function YellowPagesAdminPage() {
 
   const saveMutation = useMutation({
     mutationFn: ({ id, values }: { id?: number; values: EntryFormValues }) => {
-      const body = { ...values, photoUrl: values.photoUrl ?? "" }
+      const body = { ...values, photoUrl: values.photoUrl ?? "", tags: parseTags(values.tags) }
       return id ? api.patch(`/directory/${id}`, body) : api.post("/directory", body)
     },
     onSuccess: (_, { id }) => onSaved(id ? "Entry updated." : "Entry added."),
@@ -192,7 +240,9 @@ function YellowPagesAdminPage() {
 
   const openCreate = () => {
     setEditing(null)
-    form.reset({ ...EMPTY_FORM, category: category === "all" ? "personnel" : category })
+    const initial = category === "all" ? "personnel" : category
+    // Alumni phone numbers are hidden by default.
+    form.reset({ ...EMPTY_FORM, category: initial, showPhone: initial !== "alumni" })
     setDialogOpen(true)
   }
 
@@ -207,7 +257,7 @@ function YellowPagesAdminPage() {
     (e) =>
       (category === "all" || e.category === category) &&
       (!query ||
-        [e.name, e.title, e.subtitle, e.phone, e.email, e.location].some((f) =>
+        [e.name, e.title, e.subtitle, e.phone, e.email, e.location, ...(e.tags ?? [])].some((f) =>
           f?.toLowerCase().includes(query),
         )),
   )
@@ -305,7 +355,10 @@ function YellowPagesAdminPage() {
                     ) : (
                       <div className="size-9 rounded-lg bg-primary/10" />
                     )}
-                    <span className="font-medium text-foreground">{e.name}</span>
+                    <div className="flex flex-col gap-1">
+                      <span className="font-medium text-foreground">{e.name}</span>
+                      <TagBadges tags={e.tags ?? []} />
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -387,7 +440,14 @@ function YellowPagesAdminPage() {
                   control={form.control}
                   name="category"
                   render={({ field }) => (
-                    <Select value={field.value} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      onValueChange={(v) => {
+                        field.onChange(v)
+                        // New entries: alumni phone numbers start hidden.
+                        if (!editing) form.setValue("showPhone", v !== "alumni")
+                      }}
+                    >
                       <SelectTrigger className="w-full">
                         <SelectValue />
                       </SelectTrigger>
@@ -406,19 +466,28 @@ function YellowPagesAdminPage() {
                 <Input {...form.register("name")} />
               </FormField>
               <FormField
-                label={isBusiness ? "Business Type" : "Role / Position"}
+                label={isBusiness ? "Business Type" : isAlumni ? "Current Role" : "Role / Position"}
                 error={errors.title?.message}
               >
                 <Input
-                  placeholder={isBusiness ? "e.g. Food & Beverage" : "e.g. JCR President"}
+                  placeholder={
+                    isBusiness ? "e.g. Food & Beverage" : isAlumni ? "e.g. Software Engineer, Google" : "e.g. JCR President"
+                  }
                   {...form.register("title")}
                 />
               </FormField>
-              <FormField label={isBusiness ? "Description" : "Office / Department"}>
-                <Input {...form.register("subtitle")} />
+              <FormField label={isBusiness ? "Description" : isAlumni ? "Class / Programme" : "Office / Department"}>
+                <Input
+                  placeholder={isAlumni ? "e.g. Class of 2015 · BSc Computer Science" : undefined}
+                  {...form.register("subtitle")}
+                />
               </FormField>
-              <FormField label="Phone">
+              <FormField label="Phone" hint={form.watch("showPhone") ? "Shown on the public page" : "Hidden on the public page"}>
                 <Input {...form.register("phone")} />
+                <label className="mt-1 flex cursor-pointer items-center gap-2 text-xs font-medium text-muted-foreground">
+                  <input type="checkbox" className="h-3.5 w-3.5 rounded border-input" {...form.register("showPhone")} />
+                  Show phone number publicly
+                </label>
               </FormField>
               <FormField label="Email" error={errors.email?.message}>
                 <Input type="email" {...form.register("email")} />
@@ -442,11 +511,20 @@ function YellowPagesAdminPage() {
                   />
                 </FormField>
               )}
-              {isBusiness && (
-                <FormField label="Website" error={errors.websiteUrl?.message}>
+              {(isBusiness || isAlumni) && (
+                <FormField label={isAlumni ? "LinkedIn or Website" : "Website"} error={errors.websiteUrl?.message}>
                   <Input placeholder="https://" {...form.register("websiteUrl")} />
                 </FormField>
               )}
+              <FormField
+                label="Tags (optional)"
+                hint="Separate with commas, e.g. Class of 2015, Mentor"
+                error={errors.tags?.message}
+                className="sm:col-span-2"
+              >
+                <Input placeholder="e.g. Class of 2015, Mentor" {...form.register("tags")} />
+                <TagBadges tags={parseTags(form.watch("tags"))} />
+              </FormField>
               <FormField label="Display Order" hint="Lower numbers appear first">
                 <Input type="number" min={0} {...form.register("sortOrder", { valueAsNumber: true })} />
               </FormField>

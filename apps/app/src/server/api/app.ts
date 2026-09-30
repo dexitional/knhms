@@ -26,6 +26,7 @@ import { hubRoute } from "./modules/hub/route.js";
 import { freshmenRoute } from "./modules/freshmen/route.js";
 import { inventoryRoute } from "./modules/inventory/route.js";
 import { analyticsRoute } from "./modules/analytics/route.js";
+import { alumniRoute } from "./modules/alumni/route.js";
 
 const app = new Hono();
 
@@ -55,6 +56,7 @@ app.route("/hub", hubRoute);
 app.route("/freshmen", freshmenRoute);
 app.route("/inventory", inventoryRoute);
 app.route("/analytics", analyticsRoute);
+app.route("/alumni", alumniRoute);
 
 export type AppType = typeof app;
 export { app as apiApp };

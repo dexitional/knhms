@@ -42,6 +42,15 @@ import {
 import { canManage } from '#/lib/permissions'
 import { Pagination } from '#/components/pagination'
 
+import { ALUMNI_HUB_CATEGORY, isAlumniHubPost } from '#/lib/alumni'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '#/components/ui/select.tsx'
+
 const PAGE_SIZE = 15
 
 export const Route = createFileRoute('/admin/_admin/hub/')({
@@ -102,7 +111,7 @@ const TABS: Array<{
   },
 ]
 
-const ANNOUNCEMENT_CATEGORIES = ['Important', 'General']
+const ANNOUNCEMENT_CATEGORIES = ['Important', 'General', ALUMNI_HUB_CATEGORY]
 const NEWS_CATEGORIES = [
   'General',
   'Hall Life',
@@ -306,6 +315,9 @@ function HubAdminPage() {
                       <Badge variant="warning">Featured</Badge>
                     )}
                     {isPastEvent(p) && <Badge variant="secondary">Past</Badge>}
+                    {isAlumniHubPost(p.category) && (
+                      <Badge variant="purple">Alumni page</Badge>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
@@ -573,13 +585,42 @@ function PostDialog({
           )}
 
           <div className="grid gap-4 sm:grid-cols-2">
+            {type === 'event' && (
+              <FormField
+                label="Show on"
+                hint="Alumni events appear on the Alumni page instead of the KNH Hub"
+              >
+                <Controller
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <Select
+                      value={isAlumniHubPost(field.value) ? 'alumni' : 'hub'}
+                      onValueChange={(v) =>
+                        field.onChange(v === 'alumni' ? ALUMNI_HUB_CATEGORY : '')
+                      }
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hub">KNH Hub (everyone)</SelectItem>
+                        <SelectItem value="alumni">Alumni page</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </FormField>
+            )}
             {type !== 'event' && (
               <FormField
                 label="Category"
                 hint={
                   type === 'spotlight'
                     ? 'Badge on the slide (optional)'
-                    : undefined
+                    : type === 'announcement'
+                      ? `Choose "${ALUMNI_HUB_CATEGORY}" to post it on the Alumni page instead of the KNH Hub`
+                      : undefined
                 }
               >
                 <Input
@@ -688,7 +729,8 @@ function PostDialog({
                 className="h-4 w-4 rounded border-input"
                 {...form.register('isPublished')}
               />
-              Published (visible on the KNH Hub)
+              Published (visible on the{' '}
+              {isAlumniHubPost(form.watch('category')) ? 'Alumni page' : 'KNH Hub'})
             </label>
             {type === 'event' && (
               <label className="flex cursor-pointer items-center gap-2 text-sm font-medium">

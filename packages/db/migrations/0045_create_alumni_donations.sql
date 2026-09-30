@@ -1,0 +1,22 @@
+CREATE TABLE IF NOT EXISTS alumni_donations (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  donor_name VARCHAR(150) NOT NULL,
+  email VARCHAR(150) NULL,
+  phone VARCHAR(30) NULL,
+  amount DECIMAL(12, 2) NOT NULL,
+  project_id INT UNSIGNED NULL,
+  method ENUM('momo', 'bank', 'card', 'cash', 'other') NOT NULL DEFAULT 'momo',
+  reference VARCHAR(100) NULL,
+  message VARCHAR(500) NULL,
+  is_anonymous TINYINT(1) NOT NULL DEFAULT 0,
+  status ENUM('pledged', 'confirmed', 'declined') NOT NULL DEFAULT 'pledged',
+  donated_on DATE NOT NULL,
+  confirmed_by INT UNSIGNED NULL,
+  confirmed_at DATETIME NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_alumni_donations_status (status, donated_on),
+  CONSTRAINT fk_alumni_donations_project FOREIGN KEY (project_id) REFERENCES alumni_projects (id) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT fk_alumni_donations_confirmed_by FOREIGN KEY (confirmed_by) REFERENCES admins (id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

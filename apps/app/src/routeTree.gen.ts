@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebRouteRouteImport } from './routes/_web/route'
 import { Route as WebIndexRouteImport } from './routes/_web/index'
+import { Route as WebAlumniRouteImport } from './routes/_web/alumni'
 import { Route as WebEMarketRouteImport } from './routes/_web/e-market'
 import { Route as WebFreshmenRouteImport } from './routes/_web/freshmen'
 import { Route as WebKnhHubRouteImport } from './routes/_web/knh-hub'
@@ -41,6 +42,7 @@ import { Route as SellerSellerProductsRouteImport } from './routes/seller/_selle
 import { Route as StudentStudentIndexRouteImport } from './routes/student/_student/index'
 import { Route as StudentStudentProfileRouteImport } from './routes/student/_student/profile'
 import { Route as StudentStudentSuggestionsRouteImport } from './routes/student/_student/suggestions'
+import { Route as AdminAdminAlumniIndexRouteImport } from './routes/admin/_admin/alumni/index'
 import { Route as AdminAdminEMarketIndexRouteImport } from './routes/admin/_admin/e-market/index'
 import { Route as AdminAdminFreshmenIndexRouteImport } from './routes/admin/_admin/freshmen/index'
 import { Route as AdminAdminHubIndexRouteImport } from './routes/admin/_admin/hub/index'
@@ -71,6 +73,11 @@ const WebRouteRoute = WebRouteRouteImport.update({
 const WebIndexRoute = WebIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebAlumniRoute = WebAlumniRouteImport.update({
+  id: '/alumni',
+  path: '/alumni',
   getParentRoute: () => WebRouteRoute,
 } as any)
 const WebEMarketRoute = WebEMarketRouteImport.update({
@@ -224,6 +231,11 @@ const StudentStudentSuggestionsRoute =
     path: '/suggestions',
     getParentRoute: () => StudentStudentRouteRoute,
   } as any)
+const AdminAdminAlumniIndexRoute = AdminAdminAlumniIndexRouteImport.update({
+  id: '/alumni/',
+  path: '/alumni/',
+  getParentRoute: () => AdminAdminRouteRoute,
+} as any)
 const AdminAdminEMarketIndexRoute = AdminAdminEMarketIndexRouteImport.update({
   id: '/e-market/',
   path: '/e-market/',
@@ -349,6 +361,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminAdminRouteRouteWithChildren
   '/seller': typeof SellerSellerRouteRouteWithChildren
   '/student': typeof StudentStudentRouteRouteWithChildren
+  '/alumni': typeof WebAlumniRoute
   '/e-market': typeof WebEMarketRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
@@ -384,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/alumni/': typeof AdminAdminAlumniIndexRoute
   '/admin/e-market/': typeof AdminAdminEMarketIndexRoute
   '/admin/freshmen/': typeof AdminAdminFreshmenIndexRoute
   '/admin/hub/': typeof AdminAdminHubIndexRoute
@@ -400,6 +414,7 @@ export interface FileRoutesByFullPath {
   '/student/repairs/': typeof StudentStudentRepairsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/alumni': typeof WebAlumniRoute
   '/e-market': typeof WebEMarketRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
@@ -436,6 +451,7 @@ export interface FileRoutesByTo {
   '/admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/alumni': typeof AdminAdminAlumniIndexRoute
   '/admin/e-market': typeof AdminAdminEMarketIndexRoute
   '/admin/freshmen': typeof AdminAdminFreshmenIndexRoute
   '/admin/hub': typeof AdminAdminHubIndexRoute
@@ -457,6 +473,7 @@ export interface FileRoutesById {
   '/admin/_admin': typeof AdminAdminRouteRouteWithChildren
   '/seller/_seller': typeof SellerSellerRouteRouteWithChildren
   '/student/_student': typeof StudentStudentRouteRouteWithChildren
+  '/_web/alumni': typeof WebAlumniRoute
   '/_web/e-market': typeof WebEMarketRoute
   '/_web/freshmen': typeof WebFreshmenRoute
   '/_web/knh-hub': typeof WebKnhHubRoute
@@ -493,6 +510,7 @@ export interface FileRoutesById {
   '/admin/_admin/students/$studentId': typeof AdminAdminStudentsStudentIdRoute
   '/student/_student/orders/new': typeof StudentStudentOrdersNewRoute
   '/student/_student/repairs/new': typeof StudentStudentRepairsNewRoute
+  '/admin/_admin/alumni/': typeof AdminAdminAlumniIndexRoute
   '/admin/_admin/e-market/': typeof AdminAdminEMarketIndexRoute
   '/admin/_admin/freshmen/': typeof AdminAdminFreshmenIndexRoute
   '/admin/_admin/hub/': typeof AdminAdminHubIndexRoute
@@ -515,6 +533,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/seller'
     | '/student'
+    | '/alumni'
     | '/e-market'
     | '/freshmen'
     | '/knh-hub'
@@ -550,6 +569,7 @@ export interface FileRouteTypes {
     | '/admin/students/$studentId'
     | '/student/orders/new'
     | '/student/repairs/new'
+    | '/admin/alumni/'
     | '/admin/e-market/'
     | '/admin/freshmen/'
     | '/admin/hub/'
@@ -566,6 +586,7 @@ export interface FileRouteTypes {
     | '/student/repairs/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/alumni'
     | '/e-market'
     | '/freshmen'
     | '/knh-hub'
@@ -602,6 +623,7 @@ export interface FileRouteTypes {
     | '/admin/students/$studentId'
     | '/student/orders/new'
     | '/student/repairs/new'
+    | '/admin/alumni'
     | '/admin/e-market'
     | '/admin/freshmen'
     | '/admin/hub'
@@ -622,6 +644,7 @@ export interface FileRouteTypes {
     | '/admin/_admin'
     | '/seller/_seller'
     | '/student/_student'
+    | '/_web/alumni'
     | '/_web/e-market'
     | '/_web/freshmen'
     | '/_web/knh-hub'
@@ -658,6 +681,7 @@ export interface FileRouteTypes {
     | '/admin/_admin/students/$studentId'
     | '/student/_student/orders/new'
     | '/student/_student/repairs/new'
+    | '/admin/_admin/alumni/'
     | '/admin/_admin/e-market/'
     | '/admin/_admin/freshmen/'
     | '/admin/_admin/hub/'
@@ -704,6 +728,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof WebIndexRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/alumni': {
+      id: '/_web/alumni'
+      path: '/alumni'
+      fullPath: '/alumni'
+      preLoaderRoute: typeof WebAlumniRouteImport
       parentRoute: typeof WebRouteRoute
     }
     '/_web/e-market': {
@@ -916,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StudentStudentSuggestionsRouteImport
       parentRoute: typeof StudentStudentRouteRoute
     }
+    '/admin/_admin/alumni/': {
+      id: '/admin/_admin/alumni/'
+      path: '/alumni'
+      fullPath: '/admin/alumni/'
+      preLoaderRoute: typeof AdminAdminAlumniIndexRouteImport
+      parentRoute: typeof AdminAdminRouteRoute
+    }
     '/admin/_admin/e-market/': {
       id: '/admin/_admin/e-market/'
       path: '/e-market'
@@ -1074,6 +1112,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface WebRouteRouteChildren {
+  WebAlumniRoute: typeof WebAlumniRoute
   WebEMarketRoute: typeof WebEMarketRoute
   WebFreshmenRoute: typeof WebFreshmenRoute
   WebKnhHubRoute: typeof WebKnhHubRoute
@@ -1084,6 +1123,7 @@ interface WebRouteRouteChildren {
 }
 
 const WebRouteRouteChildren: WebRouteRouteChildren = {
+  WebAlumniRoute: WebAlumniRoute,
   WebEMarketRoute: WebEMarketRoute,
   WebFreshmenRoute: WebFreshmenRoute,
   WebKnhHubRoute: WebKnhHubRoute,
@@ -1107,6 +1147,7 @@ interface AdminAdminRouteRouteChildren {
   AdminAdminStaffStaffIdRoute: typeof AdminAdminStaffStaffIdRoute
   AdminAdminStaffNewRoute: typeof AdminAdminStaffNewRoute
   AdminAdminStudentsStudentIdRoute: typeof AdminAdminStudentsStudentIdRoute
+  AdminAdminAlumniIndexRoute: typeof AdminAdminAlumniIndexRoute
   AdminAdminEMarketIndexRoute: typeof AdminAdminEMarketIndexRoute
   AdminAdminFreshmenIndexRoute: typeof AdminAdminFreshmenIndexRoute
   AdminAdminHubIndexRoute: typeof AdminAdminHubIndexRoute
@@ -1131,6 +1172,7 @@ const AdminAdminRouteRouteChildren: AdminAdminRouteRouteChildren = {
   AdminAdminStaffStaffIdRoute: AdminAdminStaffStaffIdRoute,
   AdminAdminStaffNewRoute: AdminAdminStaffNewRoute,
   AdminAdminStudentsStudentIdRoute: AdminAdminStudentsStudentIdRoute,
+  AdminAdminAlumniIndexRoute: AdminAdminAlumniIndexRoute,
   AdminAdminEMarketIndexRoute: AdminAdminEMarketIndexRoute,
   AdminAdminFreshmenIndexRoute: AdminAdminFreshmenIndexRoute,
   AdminAdminHubIndexRoute: AdminAdminHubIndexRoute,

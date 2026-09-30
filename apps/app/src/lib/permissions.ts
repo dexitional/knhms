@@ -24,6 +24,7 @@ export type AdminModule =
   | "market"
   | "sellers"
   | "inventory"
+  | "alumni"
   | "users";
 
 export type Access = "view" | "manage";
@@ -42,6 +43,7 @@ const ALL_MODULES: Array<AdminModule> = [
   "market",
   "sellers",
   "inventory",
+  "alumni",
   "users",
 ];
 
@@ -141,6 +143,7 @@ export const MODULE_PATHS: Array<[AdminModule, string]> = [
   ["market", "/admin/e-market"],
   ["sellers", "/admin/sellers"],
   ["inventory", "/admin/inventory"],
+  ["alumni", "/admin/alumni"],
   ["users", "/admin/staff"],
 ];
 

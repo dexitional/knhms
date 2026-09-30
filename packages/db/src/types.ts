@@ -126,7 +126,7 @@ export interface AdminPasswordResetOtpRow {
 }
 
 // "page_personnel" is admin-only — never returned to the public Yellow Pages.
-export type DirectoryCategory = "personnel" | "business" | "executive" | "page_personnel";
+export type DirectoryCategory = "personnel" | "business" | "executive" | "page_personnel" | "alumni";
 
 export interface DirectoryEntryRow {
   id: number;
@@ -135,12 +135,16 @@ export interface DirectoryEntryRow {
   title: string;
   subtitle: string | null;
   phone: string | null;
+  // 0 hides the phone number on the public site (default for alumni).
+  show_phone: 0 | 1;
   email: string | null;
   location: string | null;
   hours: string | null;
   photo_url: string | null;
   map_query: string | null;
   website_url: string | null;
+  // JSON column; mysql2 parses it into an array.
+  tags: string[] | null;
   sort_order: number;
   is_active: 0 | 1;
   created_at: string;

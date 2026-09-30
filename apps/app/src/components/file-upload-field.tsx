@@ -6,7 +6,14 @@ import { api } from "#/lib/api-client";
 
 const MAX_BYTES = 8 * 1024 * 1024; // 8MB
 
-export type UploadFolder = "student-photos" | "receipts" | "admin-photos" | "directory-photos" | "market-images" | "hub-images";
+export type UploadFolder =
+  | "student-photos"
+  | "receipts"
+  | "admin-photos"
+  | "directory-photos"
+  | "market-images"
+  | "hub-images"
+  | "alumni-images";
 
 interface PresignResponse {
   uploadUrl: string;
@@ -19,6 +26,7 @@ const ACCEPT_BY_FOLDER: Record<UploadFolder, string> = {
   "directory-photos": "image/jpeg,image/png,image/webp",
   "market-images": "image/jpeg,image/png,image/webp",
   "hub-images": "image/jpeg,image/png,image/webp",
+  "alumni-images": "image/jpeg,image/png,image/webp",
   receipts: "image/jpeg,image/png,image/webp,application/pdf",
 };
 

@@ -33,6 +33,7 @@ type Entry = {
   phone?: string
   email?: string
   photo?: string
+  tags: Array<string>
   business?: { mapQuery: string; website?: string }
 }
 
@@ -51,6 +52,7 @@ function toEntry(row: DirectoryEntryRow): Entry {
     phone: row.phone ?? undefined,
     email: row.email ?? undefined,
     photo: row.photo_url ?? undefined,
+    tags: row.tags ?? [],
     business:
       row.category === 'business'
         ? {
@@ -63,6 +65,29 @@ function toEntry(row: DirectoryEntryRow): Entry {
           }
         : undefined,
   }
+}
+
+// Rounded badges for an entry's tags (e.g. "Class of 2015", "Mentor").
+function TagBadges({
+  tags,
+  className,
+}: {
+  tags: Array<string>
+  className?: string
+}) {
+  if (tags.length === 0) return null
+  return (
+    <ul className={cn('flex flex-wrap gap-1.5', className)} aria-label="Tags">
+      {tags.map((tag) => (
+        <li
+          key={tag}
+          className="rounded-full border border-primary/20 bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
+        >
+          {tag}
+        </li>
+      ))}
+    </ul>
+  )
 }
 
 function googleMapsUrl(query: string) {
@@ -151,6 +176,12 @@ const SECTIONS: Array<{
     label: 'executives',
     byName: 'surname',
   },
+  {
+    category: 'alumni',
+    heading: 'Alumni',
+    label: 'alumni',
+    byName: 'surname',
+  },
 ]
 
 const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
@@ -167,6 +198,7 @@ function matches(entry: Entry, query: string) {
     entry.title,
     entry.subtitle,
     ...entry.details.map((d) => d.value),
+    ...entry.tags,
   ].some((field) => field.toLowerCase().includes(query))
 }
 
@@ -546,7 +578,9 @@ function YellowPagesPage() {
                   >
                     <CardContent className="flex h-full flex-col gap-3">
                       <div className="flex items-center gap-4">
-                        {(entry.photo || section.category === 'executive') && (
+                        {(entry.photo ||
+                          section.category === 'executive' ||
+                          section.category === 'alumni') && (
                           <EntryPhoto
                             name={entry.name}
                             photo={entry.photo}
@@ -565,6 +599,7 @@ function YellowPagesPage() {
                           </p>
                         </div>
                       </div>
+                      <TagBadges tags={entry.tags} />
                       <div className="space-y-1.5 text-sm text-muted-foreground">
                         {entry.details.map((detail) => (
                           <p
@@ -705,6 +740,7 @@ function PersonnelCard({ entry, rank }: { entry: Entry; rank: number }) {
             <span className="truncate">{entry.subtitle}</span>
           </span>
         )}
+        <TagBadges tags={entry.tags} className="mt-2 justify-center" />
 
         {(entry.phone || entry.email) && (
           <div className="mt-4 flex items-center gap-2">

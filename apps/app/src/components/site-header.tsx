@@ -8,6 +8,7 @@ const sectionLinks = [
   { to: "/knh-hub", label: "KNH-HUB" },
   { to: "/e-market", label: "E-MARKET" },
   { to: "/yellow-pages", label: "YELLOW PAGES" },
+  { to: "/alumni", label: "ALUMNI" },
 ] as const;
 
 export function SiteHeader() {
