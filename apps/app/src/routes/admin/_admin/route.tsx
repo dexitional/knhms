@@ -63,7 +63,7 @@ const navItems = [
   { to: "/admin/yellow-pages", label: "Yellow Pages", icon: BookUser, module: "yellowPages" },
   { to: "/admin/e-market", label: "E-Market", icon: Store, module: "market" },
   { to: "/admin/sellers", label: "Sellers", icon: BadgeCheck, module: "sellers" },
-  { to: "/admin/inventory", label: "Inventories", icon: Boxes, module: "inventory" },
+  { to: "/admin/inventory", label: "Stores", icon: Boxes, module: "inventory" },
   { to: "/admin/alumni", label: "Alumni", icon: HeartHandshake, module: "alumni" },
   { to: "/admin/staff", label: "Users", icon: ShieldCheck, module: "users" },
 ] as const;

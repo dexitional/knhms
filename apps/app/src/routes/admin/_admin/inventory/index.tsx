@@ -54,7 +54,7 @@ function InventoryPage() {
   })
 
   if (!allowed) {
-    return <p className="text-muted-foreground">You don't have access to the inventories.</p>
+    return <p className="text-muted-foreground">You don't have access to the stores.</p>
   }
 
   const stock = items.data?.items ?? []
@@ -71,7 +71,7 @@ function InventoryPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Inventories</h1>
+        <h1 className="text-2xl font-bold text-foreground">Stores</h1>
         <p className="text-sm text-muted-foreground">
           Hall stock, requests for items, and reports. Requests go from pending to approved (super admin) to released
           (stores).

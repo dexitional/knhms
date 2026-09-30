@@ -26,7 +26,9 @@ export const reportsRoute = new Hono()
     const report = await service.getRepairsReport(query);
     return c.json(report);
   })
-  .get("/overview", requirePermission("overview", "view"), async (c) => {
-    const overview = await service.getOverview();
-    return c.json(overview);
-  });
+  .get(
+    "/overview",
+    requirePermission("overview", "view"),
+    zValidator("query", z.object({ period: z.enum(["week", "month", "quarter", "year"]).default("month") })),
+    async (c) => c.json(await service.getOverview(c.req.valid("query").period)),
+  );

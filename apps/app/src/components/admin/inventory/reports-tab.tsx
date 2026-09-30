@@ -15,13 +15,11 @@ import {
 } from "recharts"
 import { AlertTriangle, CheckCircle2, Clock, FileSpreadsheet, PackageCheck, Boxes, Send } from "lucide-react"
 import { api } from "#/lib/api-client"
-import { cn } from "#/lib/utils"
-import { PERIOD_LABELS, STATUS_LABELS } from "#/lib/inventory"
+import { STATUS_LABELS } from "#/lib/inventory"
 import type { InventoryCategory, InventoryReport, ReportPeriod } from "#/lib/inventory"
 import { Button } from "#/components/ui/button.tsx"
+import { ChartCard, ChartEmpty, HealthBar, Kpi, PeriodTabs, TREND_TITLE } from "#/components/admin/report-ui"
 import { CategorySelect } from "./stock-tab"
-
-const PERIODS: Array<ReportPeriod> = ["week", "month", "quarter", "year"]
 
 // Fixed chart colours: amber = requested/pending, blue = approved,
 // green = released, rose = rejected, slate = cancelled.
@@ -34,53 +32,6 @@ const COLORS = {
   pending: "#f59e0b",
   primary: "#fa6400",
 } as const
-
-const TREND_TITLE: Record<ReportPeriod, string> = {
-  week: "Last 12 weeks",
-  month: "Last 12 months",
-  quarter: "Last 8 quarters",
-  year: "Last 5 years",
-}
-
-function Kpi({
-  label,
-  value,
-  icon: Icon,
-  tone,
-  hint,
-}: {
-  label: string
-  value: number
-  icon: typeof Clock
-  tone: string
-  hint?: string
-}) {
-  return (
-    <div className="relative overflow-hidden rounded-xl border border-border bg-card p-4">
-      <span className={cn("absolute -top-4 -right-4 size-16 rounded-full opacity-10", tone)} aria-hidden="true" />
-      <span className={cn("flex size-9 items-center justify-center rounded-lg text-white", tone)}>
-        <Icon className="size-5" />
-      </span>
-      <p className="mt-3 text-2xl font-black text-foreground">{value.toLocaleString()}</p>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
-      {hint && <p className="text-xs text-muted-foreground/80">{hint}</p>}
-    </div>
-  )
-}
-
-function ChartCard({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
-  return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <p className="font-semibold text-foreground">{title}</p>
-      {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
-      <div className="mt-3">{children}</div>
-    </div>
-  )
-}
-
-const Empty = ({ children }: { children: React.ReactNode }) => (
-  <p className="flex h-56 items-center justify-center text-sm text-muted-foreground">{children}</p>
-)
 
 export function ReportsTab({ categories }: { categories: Array<InventoryCategory> }) {
   const [period, setPeriod] = useState<ReportPeriod>("month")
@@ -95,23 +46,7 @@ export function ReportsTab({ categories }: { categories: Array<InventoryCategory
   return (
     <div className="flex flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex gap-1 rounded-lg bg-secondary p-1" role="tablist" aria-label="Report period">
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              type="button"
-              role="tab"
-              aria-selected={period === p}
-              onClick={() => setPeriod(p)}
-              className={cn(
-                "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-                period === p ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {PERIOD_LABELS[p]}
-            </button>
-          ))}
-        </div>
+        <PeriodTabs value={period} onChange={setPeriod} />
         <div className="flex flex-wrap items-center gap-2">
           <CategorySelect value={category} onChange={setCategory} categories={categories} />
           <Button asChild variant="outline">
@@ -185,7 +120,7 @@ export function ReportsTab({ categories }: { categories: Array<InventoryCategory
           <div className="grid gap-4 lg:grid-cols-3">
             <ChartCard title="Status of this period's requests" subtitle="Where requests raised this period stand now">
               {data.statusMix.length === 0 ? (
-                <Empty>No requests this period.</Empty>
+                <ChartEmpty>No requests this period.</ChartEmpty>
               ) : (
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
@@ -215,7 +150,7 @@ export function ReportsTab({ categories }: { categories: Array<InventoryCategory
 
             <ChartCard title="Most released items" subtitle="Units released this period">
               {data.topItems.length === 0 ? (
-                <Empty>Nothing released this period.</Empty>
+                <ChartEmpty>Nothing released this period.</ChartEmpty>
               ) : (
                 <div className="h-56">
                   <ResponsiveContainer width="100%" height="100%">
@@ -254,37 +189,14 @@ export function ReportsTab({ categories }: { categories: Array<InventoryCategory
 }
 
 function StockHealth({ stock }: { stock: InventoryReport["stock"] }) {
-  const rows = [
-    { label: "In stock", value: stock.ok, color: "bg-emerald-500" },
-    { label: "Low stock", value: stock.low, color: "bg-amber-500" },
-    { label: "Out of stock", value: stock.out, color: "bg-rose-500" },
-  ]
-  const total = Math.max(stock.total, 1)
   return (
-    <div className="flex h-56 flex-col justify-center gap-5">
-      <div className="flex h-4 overflow-hidden rounded-full bg-secondary" aria-hidden="true">
-        {rows.map((r) => (
-          <div
-            key={r.label}
-            className={cn("h-full transition-all duration-700", r.color)}
-            style={{ width: `${(r.value / total) * 100}%` }}
-          />
-        ))}
-      </div>
-      <ul className="flex flex-col gap-3">
-        {rows.map((r) => (
-          <li key={r.label} className="flex items-center justify-between text-sm">
-            <span className="flex items-center gap-2">
-              <span className={cn("size-3 rounded-full", r.color)} />
-              {r.label}
-            </span>
-            <span className="font-semibold text-foreground">
-              {r.value}{" "}
-              <span className="font-normal text-muted-foreground">({Math.round((r.value / total) * 100)}%)</span>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </div>
+    <HealthBar
+      total={stock.total}
+      rows={[
+        { label: "In stock", value: stock.ok, color: "bg-emerald-500" },
+        { label: "Low stock", value: stock.low, color: "bg-amber-500" },
+        { label: "Out of stock", value: stock.out, color: "bg-rose-500" },
+      ]}
+    />
   )
 }

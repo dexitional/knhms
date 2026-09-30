@@ -68,6 +68,7 @@ const PERMISSIONS: Record<AdminRole, Partial<Record<AdminModule, Access>>> = {
     students: "view",
     hub: "manage",
     freshmen: "manage",
+    alumni: "manage",
   },
   editor: {
     hub: "manage",

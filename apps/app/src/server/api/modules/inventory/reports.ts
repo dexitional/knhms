@@ -7,55 +7,12 @@ import { LEVEL_LABELS, MOVEMENT_LABELS, STATUS_LABELS, requestReference, stockLe
 import type { InventoryReport, ReportBucket, ReportPeriod, RequestStatus } from "#/lib/inventory";
 
 // Inventory reports: request activity for the current week/month/quarter/
-// year with a trend over recent periods, and an Excel export of stock.
-// Dates are compared as "YYYY-MM-DD HH:MM:SS" strings (Ghana is UTC+0 and
-// the pool returns dateStrings).
+// year with a trend over recent periods (see lib/periods.ts), and an Excel
+// export of stock.
 
-const TREND_LENGTH: Record<ReportPeriod, number> = { week: 12, month: 12, quarter: 8, year: 5 };
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+import { TREND_LENGTH, periodRange, shift, bucketLabel, within, ymd } from "../../lib/periods.js";
 
-const ymd = (d: Date) => d.toISOString().slice(0, 10);
-
-function startOf(period: ReportPeriod, date: Date): Date {
-  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
-  if (period === "week") d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7)); // Monday
-  if (period === "month") d.setUTCDate(1);
-  if (period === "quarter") d.setUTCMonth(Math.floor(d.getUTCMonth() / 3) * 3, 1);
-  if (period === "year") d.setUTCMonth(0, 1);
-  return d;
-}
-
-function shift(period: ReportPeriod, date: Date, n: number): Date {
-  const d = new Date(date);
-  if (period === "week") d.setUTCDate(d.getUTCDate() + 7 * n);
-  if (period === "month") d.setUTCMonth(d.getUTCMonth() + n);
-  if (period === "quarter") d.setUTCMonth(d.getUTCMonth() + 3 * n);
-  if (period === "year") d.setUTCFullYear(d.getUTCFullYear() + n);
-  return d;
-}
-
-function bucketLabel(period: ReportPeriod, start: Date): string {
-  const month = MONTHS[start.getUTCMonth()]!;
-  const year = start.getUTCFullYear();
-  if (period === "week") return `${start.getUTCDate()} ${month}`;
-  if (period === "month") return `${month} ${String(year).slice(2)}`;
-  if (period === "quarter") return `Q${Math.floor(start.getUTCMonth() / 3) + 1} ${year}`;
-  return String(year);
-}
-
-function rangeLabel(period: ReportPeriod, start: Date): string {
-  if (period === "week") return `Week of ${start.getUTCDate()} ${MONTHS[start.getUTCMonth()]} ${start.getUTCFullYear()}`;
-  if (period === "month") return `${MONTHS[start.getUTCMonth()]} ${start.getUTCFullYear()}`;
-  return bucketLabel(period, start);
-}
-
-export function periodRange(period: ReportPeriod, now = new Date()) {
-  const from = startOf(period, now);
-  const to = shift(period, from, 1);
-  return { from: `${ymd(from)} 00:00:00`, to: `${ymd(to)} 00:00:00`, label: rangeLabel(period, from), start: from };
-}
-
-const within = (value: string | null, from: string, to: string) => !!value && value >= from && value < to;
+export { periodRange };
 
 // With a category, requests count when they include at least one of its
 // items, and stock/units figures cover only its items.
