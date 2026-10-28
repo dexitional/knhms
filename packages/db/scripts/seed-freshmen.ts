@@ -1,9 +1,9 @@
 import "dotenv/config";
 import mysql from "mysql2/promise";
 
-// Optional one-time seed of the Freshmen guide (the content that used to be
+// Optional one-time seed of the Freshers guide (the content that used to be
 // hardcoded in the page). It's general starter content — review and edit it
-// from Admin → Freshmen Guide before relying on it. Skips seeding if any
+// from Admin → Freshers Guide before relying on it. Skips seeding if any
 // guide or FAQ already exists, so re-running never duplicates.
 
 interface Item {
@@ -150,7 +150,7 @@ const GUIDES: Guide[] = [
   },
   {
     title: "Mandatory activities",
-    summary: "The activities every freshman must take part in during their first weeks.",
+    summary: "The activities every fresher must take part in during their first weeks.",
     icon: "users",
     sections: [
       {
@@ -163,7 +163,7 @@ const GUIDES: Guide[] = [
           },
           {
             title: "Attendance",
-            body: "<p>Attendance is compulsory for all freshmen. If you can't attend for a genuine reason, inform the hall office beforehand.</p>",
+            body: "<p>Attendance is compulsory for all freshers. If you can't attend for a genuine reason, inform the hall office beforehand.</p>",
           },
         ],
       },
@@ -298,7 +298,7 @@ async function main() {
     "SELECT (SELECT COUNT(*) FROM freshmen_guides) + (SELECT COUNT(*) FROM freshmen_faqs) AS count",
   );
   if (Number(rows[0]?.count) > 0) {
-    console.log("The Freshmen guide already has content — skipping seed.");
+    console.log("The Freshers guide already has content — skipping seed.");
     await connection.end();
     return;
   }
@@ -343,7 +343,7 @@ async function main() {
     throw err;
   }
 
-  console.log(`Seeded ${GUIDES.length} Freshmen guides and ${FAQS.length} FAQs.`);
+  console.log(`Seeded ${GUIDES.length} Freshers guides and ${FAQS.length} FAQs.`);
   await connection.end();
 }
 

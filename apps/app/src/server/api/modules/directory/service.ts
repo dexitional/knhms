@@ -10,7 +10,7 @@ type CreateInput = z.infer<typeof createDirectoryEntrySchema>;
 type UpdateInput = z.infer<typeof updateDirectoryEntrySchema>;
 
 const ORDER_BY =
-  "ORDER BY FIELD(category, 'personnel', 'business', 'executive', 'alumni', 'page_personnel'), sort_order, name";
+  "ORDER BY FIELD(category, 'personnel', 'business', 'executive', 'alumni', 'council', 'management', 'tutor', 'page_personnel'), sort_order, name";
 
 // Categories managed in the admin but never shown on the public page.
 const ADMIN_ONLY_CATEGORIES = ["page_personnel"];

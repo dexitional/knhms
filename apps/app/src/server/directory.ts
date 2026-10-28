@@ -2,10 +2,11 @@
 // service is imported dynamically so mysql2 stays out of the browser bundle
 // (see the note in routes/api/$.ts).
 import { createServerFn } from "@tanstack/react-start";
+import { siteOrigin } from "#/lib/posts";
 
 export const getDirectoryEntries = createServerFn({ method: "GET" }).handler(async () => {
   const { listActiveEntries } = await import("./api/modules/directory/service.js");
-  return { entries: await listActiveEntries() };
+  return { entries: await listActiveEntries(), siteUrl: siteOrigin(process.env.APP_URL) };
 });
 
 // Public Alumni page: active alumni profiles (Yellow Pages "Alumni" entries)
@@ -24,5 +25,6 @@ export const getAlumni = createServerFn({ method: "GET" }).handler(async () => {
     // "Alumni" announcements and events from Admin → KNH Hub.
     hubAnnouncements: hub.announcements,
     hubEvents: hub.events,
+    siteUrl: siteOrigin(process.env.APP_URL),
   };
 });

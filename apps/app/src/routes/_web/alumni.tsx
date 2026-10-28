@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react"
 import { createFileRoute } from "@tanstack/react-router"
+import { pageHead } from "#/lib/seo"
+import { postSlug } from "#/lib/posts"
 import { AnimatePresence, LayoutGroup, MotionConfig, motion } from "motion/react"
 import type { DirectoryEntryRow } from "@knh/db"
 import { ArrowUpRight, Globe, HandHeart, Mail, MapPin, Phone, Search, Sparkles, UserPlus, Users, X } from "lucide-react"
@@ -22,6 +24,33 @@ import { scrollToSection } from "#/components/alumni/shared"
 // donations, gallery and donation details come from Admin → Alumni.
 export const Route = createFileRoute("/_web/alumni")({
   loader: () => getAlumni(),
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: "KNH Alumni",
+          description:
+            "The Kwame Nkrumah Hall alumni network: find old Nkrumahians, join the association, follow alumni projects and events, and give back to the hall.",
+          path: "/alumni",
+          siteUrl: loaderData.siteUrl,
+          structured: {
+            "@type": "Organization",
+            name: "Kwame Nkrumah Hall Alumni",
+            url: `${loaderData.siteUrl}/alumni`,
+            logo: `${loaderData.siteUrl}/logo.png`,
+            parentOrganization: { "@type": "Organization", name: "Kwame Nkrumah Hall", url: loaderData.siteUrl },
+            ...(loaderData.hubEvents.length > 0 && {
+              event: loaderData.hubEvents.map((e) => ({
+                "@type": "Event",
+                name: e.title,
+                startDate: e.event_start ?? e.published_on,
+                ...(e.event_end && { endDate: e.event_end }),
+                url: `${loaderData.siteUrl}/events/${postSlug(e)}`,
+                location: { "@type": "Place", name: e.location || "Kwame Nkrumah Hall", address: e.location || "Kwame Nkrumah Hall" },
+              })),
+            }),
+          },
+        })
+      : {},
   component: AlumniPage,
 })
 

@@ -59,7 +59,7 @@ const navItems = [
   { to: "/admin/orders", label: "Orders", icon: ShoppingBag, module: "orders" },
   { to: "/admin/suggestions", label: "Suggestions", icon: MessageSquareHeart, module: "suggestions" },
   { to: "/admin/hub", label: "KNH Hub", icon: Newspaper, module: "hub" },
-  { to: "/admin/freshmen", label: "Freshmen Guide", icon: GraduationCap, module: "freshmen" },
+  { to: "/admin/freshmen", label: "Freshers Guide", icon: GraduationCap, module: "freshmen" },
   { to: "/admin/yellow-pages", label: "Yellow Pages", icon: BookUser, module: "yellowPages" },
   { to: "/admin/e-market", label: "E-Market", icon: Store, module: "market" },
   { to: "/admin/sellers", label: "Sellers", icon: BadgeCheck, module: "sellers" },

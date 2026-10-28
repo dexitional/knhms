@@ -87,14 +87,14 @@ function FreshmenAdminPage() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Freshmen Guide</h1>
+          <h1 className="text-2xl font-bold text-foreground">Freshers Guide</h1>
           <p className="text-sm text-muted-foreground">
-            Guides, sections and topics on the Freshmen page, plus the FAQs. The journey infographic, stats and mandatory
+            Guides, sections and topics on the Freshers page, plus the FAQs. The journey infographic, stats and mandatory
             checklist are built from these automatically.
           </p>
         </div>
         <a
-          href="/freshmen"
+          href="/freshers"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"
@@ -145,7 +145,7 @@ function FreshmenAdminPage() {
         <div className="flex flex-col gap-4">
           {guides.length === 0 && (
             <p className="rounded-xl border border-dashed border-border p-8 text-center text-muted-foreground">
-              No guides yet. Add the first one to build the Freshmen page.
+              No guides yet. Add the first one to build the Freshers page.
             </p>
           )}
           {guides.map((guide, gi) => {

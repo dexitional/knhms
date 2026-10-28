@@ -1,4 +1,4 @@
-// Client-safe names and shapes for the Freshmen guide, shared by the public
+// Client-safe names and shapes for the Freshers guide, shared by the public
 // page, the admin manager, and the API (server/api/modules/freshmen).
 // Icons are stored by name; components/freshmen-icons.tsx maps them to
 // lucide icons.

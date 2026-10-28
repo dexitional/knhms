@@ -126,7 +126,8 @@ export interface AdminPasswordResetOtpRow {
 }
 
 // "page_personnel" is admin-only — never returned to the public Yellow Pages.
-export type DirectoryCategory = "personnel" | "business" | "executive" | "page_personnel" | "alumni";
+// council / management / tutor appear only on their hall pages (Home menu).
+export type DirectoryCategory = "personnel" | "business" | "executive" | "page_personnel" | "alumni" | "council" | "management" | "tutor";
 
 export interface DirectoryEntryRow {
   id: number;

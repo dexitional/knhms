@@ -10,9 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WebRouteRouteImport } from './routes/_web/route'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as WebIndexRouteImport } from './routes/_web/index'
 import { Route as WebAlumniRouteImport } from './routes/_web/alumni'
 import { Route as WebEMarketRouteImport } from './routes/_web/e-market'
+import { Route as WebFreshersRouteImport } from './routes/_web/freshers'
 import { Route as WebFreshmenRouteImport } from './routes/_web/freshmen'
 import { Route as WebKnhHubRouteImport } from './routes/_web/knh-hub'
 import { Route as WebQrcodeRouteImport } from './routes/_web/qrcode'
@@ -28,6 +31,13 @@ import { Route as SellerRegisterRouteImport } from './routes/seller/register'
 import { Route as StudentStudentRouteRouteImport } from './routes/student/_student/route'
 import { Route as StudentForgotPinRouteImport } from './routes/student/forgot-pin'
 import { Route as StudentLoginRouteImport } from './routes/student/login'
+import { Route as WebAnnouncementsIndexRouteImport } from './routes/_web/announcements/index'
+import { Route as WebAnnouncementsSlugRouteImport } from './routes/_web/announcements/$slug'
+import { Route as WebEventsIndexRouteImport } from './routes/_web/events/index'
+import { Route as WebEventsSlugRouteImport } from './routes/_web/events/$slug'
+import { Route as WebHallPageRouteImport } from './routes/_web/hall.$page'
+import { Route as WebNewsIndexRouteImport } from './routes/_web/news/index'
+import { Route as WebNewsSlugRouteImport } from './routes/_web/news/$slug'
 import { Route as AdminAdminIndexRouteImport } from './routes/admin/_admin/index'
 import { Route as AdminAdminAccountRouteImport } from './routes/admin/_admin/account'
 import { Route as AdminAdminReportsRouteImport } from './routes/admin/_admin/reports'
@@ -70,6 +80,16 @@ const WebRouteRoute = WebRouteRouteImport.update({
   id: '/_web',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const WebIndexRoute = WebIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -83,6 +103,11 @@ const WebAlumniRoute = WebAlumniRouteImport.update({
 const WebEMarketRoute = WebEMarketRouteImport.update({
   id: '/e-market',
   path: '/e-market',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebFreshersRoute = WebFreshersRouteImport.update({
+  id: '/freshers',
+  path: '/freshers',
   getParentRoute: () => WebRouteRoute,
 } as any)
 const WebFreshmenRoute = WebFreshmenRouteImport.update({
@@ -159,6 +184,41 @@ const StudentLoginRoute = StudentLoginRouteImport.update({
   id: '/student/login',
   path: '/student/login',
   getParentRoute: () => rootRouteImport,
+} as any)
+const WebAnnouncementsIndexRoute = WebAnnouncementsIndexRouteImport.update({
+  id: '/announcements/',
+  path: '/announcements/',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebAnnouncementsSlugRoute = WebAnnouncementsSlugRouteImport.update({
+  id: '/announcements/$slug',
+  path: '/announcements/$slug',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebEventsIndexRoute = WebEventsIndexRouteImport.update({
+  id: '/events/',
+  path: '/events/',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebEventsSlugRoute = WebEventsSlugRouteImport.update({
+  id: '/events/$slug',
+  path: '/events/$slug',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebHallPageRoute = WebHallPageRouteImport.update({
+  id: '/hall/$page',
+  path: '/hall/$page',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebNewsIndexRoute = WebNewsIndexRouteImport.update({
+  id: '/news/',
+  path: '/news/',
+  getParentRoute: () => WebRouteRoute,
+} as any)
+const WebNewsSlugRoute = WebNewsSlugRouteImport.update({
+  id: '/news/$slug',
+  path: '/news/$slug',
+  getParentRoute: () => WebRouteRoute,
 } as any)
 const AdminAdminIndexRoute = AdminAdminIndexRouteImport.update({
   id: '/',
@@ -358,11 +418,14 @@ const StudentStudentRepairsNewRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof WebIndexRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin': typeof AdminAdminRouteRouteWithChildren
   '/seller': typeof SellerSellerRouteRouteWithChildren
   '/student': typeof StudentStudentRouteRouteWithChildren
   '/alumni': typeof WebAlumniRoute
   '/e-market': typeof WebEMarketRoute
+  '/freshers': typeof WebFreshersRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
   '/qrcode': typeof WebQrcodeRoute
@@ -375,6 +438,10 @@ export interface FileRoutesByFullPath {
   '/seller/register': typeof SellerRegisterRoute
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
+  '/announcements/$slug': typeof WebAnnouncementsSlugRoute
+  '/events/$slug': typeof WebEventsSlugRoute
+  '/hall/$page': typeof WebHallPageRoute
+  '/news/$slug': typeof WebNewsSlugRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
@@ -386,6 +453,9 @@ export interface FileRoutesByFullPath {
   '/seller/products': typeof SellerSellerProductsRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
+  '/announcements/': typeof WebAnnouncementsIndexRoute
+  '/events/': typeof WebEventsIndexRoute
+  '/news/': typeof WebNewsIndexRoute
   '/admin/': typeof AdminAdminIndexRoute
   '/seller/': typeof SellerSellerIndexRoute
   '/student/': typeof StudentStudentIndexRoute
@@ -414,8 +484,11 @@ export interface FileRoutesByFullPath {
   '/student/repairs/': typeof StudentStudentRepairsIndexRoute
 }
 export interface FileRoutesByTo {
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/alumni': typeof WebAlumniRoute
   '/e-market': typeof WebEMarketRoute
+  '/freshers': typeof WebFreshersRoute
   '/freshmen': typeof WebFreshmenRoute
   '/knh-hub': typeof WebKnhHubRoute
   '/qrcode': typeof WebQrcodeRoute
@@ -429,6 +502,10 @@ export interface FileRoutesByTo {
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
   '/': typeof WebIndexRoute
+  '/announcements/$slug': typeof WebAnnouncementsSlugRoute
+  '/events/$slug': typeof WebEventsSlugRoute
+  '/hall/$page': typeof WebHallPageRoute
+  '/news/$slug': typeof WebNewsSlugRoute
   '/admin/account': typeof AdminAdminAccountRoute
   '/admin/reports': typeof AdminAdminReportsRoute
   '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
@@ -440,6 +517,9 @@ export interface FileRoutesByTo {
   '/seller/products': typeof SellerSellerProductsRoute
   '/student/profile': typeof StudentStudentProfileRoute
   '/student/suggestions': typeof StudentStudentSuggestionsRoute
+  '/announcements': typeof WebAnnouncementsIndexRoute
+  '/events': typeof WebEventsIndexRoute
+  '/news': typeof WebNewsIndexRoute
   '/admin': typeof AdminAdminIndexRoute
   '/seller': typeof SellerSellerIndexRoute
   '/student': typeof StudentStudentIndexRoute
@@ -470,11 +550,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_web': typeof WebRouteRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/_admin': typeof AdminAdminRouteRouteWithChildren
   '/seller/_seller': typeof SellerSellerRouteRouteWithChildren
   '/student/_student': typeof StudentStudentRouteRouteWithChildren
   '/_web/alumni': typeof WebAlumniRoute
   '/_web/e-market': typeof WebEMarketRoute
+  '/_web/freshers': typeof WebFreshersRoute
   '/_web/freshmen': typeof WebFreshmenRoute
   '/_web/knh-hub': typeof WebKnhHubRoute
   '/_web/qrcode': typeof WebQrcodeRoute
@@ -488,6 +571,10 @@ export interface FileRoutesById {
   '/student/forgot-pin': typeof StudentForgotPinRoute
   '/student/login': typeof StudentLoginRoute
   '/_web/': typeof WebIndexRoute
+  '/_web/announcements/$slug': typeof WebAnnouncementsSlugRoute
+  '/_web/events/$slug': typeof WebEventsSlugRoute
+  '/_web/hall/$page': typeof WebHallPageRoute
+  '/_web/news/$slug': typeof WebNewsSlugRoute
   '/admin/_admin/account': typeof AdminAdminAccountRoute
   '/admin/_admin/reports': typeof AdminAdminReportsRoute
   '/print/inventory/$requestId': typeof PrintInventoryRequestIdRoute
@@ -499,6 +586,9 @@ export interface FileRoutesById {
   '/seller/_seller/products': typeof SellerSellerProductsRoute
   '/student/_student/profile': typeof StudentStudentProfileRoute
   '/student/_student/suggestions': typeof StudentStudentSuggestionsRoute
+  '/_web/announcements/': typeof WebAnnouncementsIndexRoute
+  '/_web/events/': typeof WebEventsIndexRoute
+  '/_web/news/': typeof WebNewsIndexRoute
   '/admin/_admin/': typeof AdminAdminIndexRoute
   '/seller/_seller/': typeof SellerSellerIndexRoute
   '/student/_student/': typeof StudentStudentIndexRoute
@@ -530,11 +620,14 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin'
     | '/seller'
     | '/student'
     | '/alumni'
     | '/e-market'
+    | '/freshers'
     | '/freshmen'
     | '/knh-hub'
     | '/qrcode'
@@ -547,6 +640,10 @@ export interface FileRouteTypes {
     | '/seller/register'
     | '/student/forgot-pin'
     | '/student/login'
+    | '/announcements/$slug'
+    | '/events/$slug'
+    | '/hall/$page'
+    | '/news/$slug'
     | '/admin/account'
     | '/admin/reports'
     | '/print/inventory/$requestId'
@@ -558,6 +655,9 @@ export interface FileRouteTypes {
     | '/seller/products'
     | '/student/profile'
     | '/student/suggestions'
+    | '/announcements/'
+    | '/events/'
+    | '/news/'
     | '/admin/'
     | '/seller/'
     | '/student/'
@@ -586,8 +686,11 @@ export interface FileRouteTypes {
     | '/student/repairs/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/alumni'
     | '/e-market'
+    | '/freshers'
     | '/freshmen'
     | '/knh-hub'
     | '/qrcode'
@@ -601,6 +704,10 @@ export interface FileRouteTypes {
     | '/student/forgot-pin'
     | '/student/login'
     | '/'
+    | '/announcements/$slug'
+    | '/events/$slug'
+    | '/hall/$page'
+    | '/news/$slug'
     | '/admin/account'
     | '/admin/reports'
     | '/print/inventory/$requestId'
@@ -612,6 +719,9 @@ export interface FileRouteTypes {
     | '/seller/products'
     | '/student/profile'
     | '/student/suggestions'
+    | '/announcements'
+    | '/events'
+    | '/news'
     | '/admin'
     | '/seller'
     | '/student'
@@ -641,11 +751,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_web'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin/_admin'
     | '/seller/_seller'
     | '/student/_student'
     | '/_web/alumni'
     | '/_web/e-market'
+    | '/_web/freshers'
     | '/_web/freshmen'
     | '/_web/knh-hub'
     | '/_web/qrcode'
@@ -659,6 +772,10 @@ export interface FileRouteTypes {
     | '/student/forgot-pin'
     | '/student/login'
     | '/_web/'
+    | '/_web/announcements/$slug'
+    | '/_web/events/$slug'
+    | '/_web/hall/$page'
+    | '/_web/news/$slug'
     | '/admin/_admin/account'
     | '/admin/_admin/reports'
     | '/print/inventory/$requestId'
@@ -670,6 +787,9 @@ export interface FileRouteTypes {
     | '/seller/_seller/products'
     | '/student/_student/profile'
     | '/student/_student/suggestions'
+    | '/_web/announcements/'
+    | '/_web/events/'
+    | '/_web/news/'
     | '/admin/_admin/'
     | '/seller/_seller/'
     | '/student/_student/'
@@ -700,6 +820,8 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   WebRouteRoute: typeof WebRouteRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminAdminRouteRoute: typeof AdminAdminRouteRouteWithChildren
   SellerSellerRouteRoute: typeof SellerSellerRouteRouteWithChildren
   StudentStudentRouteRoute: typeof StudentStudentRouteRouteWithChildren
@@ -723,6 +845,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WebRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_web/': {
       id: '/_web/'
       path: '/'
@@ -742,6 +878,13 @@ declare module '@tanstack/react-router' {
       path: '/e-market'
       fullPath: '/e-market'
       preLoaderRoute: typeof WebEMarketRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/freshers': {
+      id: '/_web/freshers'
+      path: '/freshers'
+      fullPath: '/freshers'
+      preLoaderRoute: typeof WebFreshersRouteImport
       parentRoute: typeof WebRouteRoute
     }
     '/_web/freshmen': {
@@ -848,6 +991,55 @@ declare module '@tanstack/react-router' {
       fullPath: '/student/login'
       preLoaderRoute: typeof StudentLoginRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_web/announcements/': {
+      id: '/_web/announcements/'
+      path: '/announcements'
+      fullPath: '/announcements/'
+      preLoaderRoute: typeof WebAnnouncementsIndexRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/announcements/$slug': {
+      id: '/_web/announcements/$slug'
+      path: '/announcements/$slug'
+      fullPath: '/announcements/$slug'
+      preLoaderRoute: typeof WebAnnouncementsSlugRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/events/': {
+      id: '/_web/events/'
+      path: '/events'
+      fullPath: '/events/'
+      preLoaderRoute: typeof WebEventsIndexRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/events/$slug': {
+      id: '/_web/events/$slug'
+      path: '/events/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof WebEventsSlugRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/hall/$page': {
+      id: '/_web/hall/$page'
+      path: '/hall/$page'
+      fullPath: '/hall/$page'
+      preLoaderRoute: typeof WebHallPageRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/news/': {
+      id: '/_web/news/'
+      path: '/news'
+      fullPath: '/news/'
+      preLoaderRoute: typeof WebNewsIndexRouteImport
+      parentRoute: typeof WebRouteRoute
+    }
+    '/_web/news/$slug': {
+      id: '/_web/news/$slug'
+      path: '/news/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof WebNewsSlugRouteImport
+      parentRoute: typeof WebRouteRoute
     }
     '/admin/_admin/': {
       id: '/admin/_admin/'
@@ -1114,23 +1306,39 @@ declare module '@tanstack/react-router' {
 interface WebRouteRouteChildren {
   WebAlumniRoute: typeof WebAlumniRoute
   WebEMarketRoute: typeof WebEMarketRoute
+  WebFreshersRoute: typeof WebFreshersRoute
   WebFreshmenRoute: typeof WebFreshmenRoute
   WebKnhHubRoute: typeof WebKnhHubRoute
   WebQrcodeRoute: typeof WebQrcodeRoute
   WebRegisterRoute: typeof WebRegisterRoute
   WebYellowPagesRoute: typeof WebYellowPagesRoute
   WebIndexRoute: typeof WebIndexRoute
+  WebAnnouncementsSlugRoute: typeof WebAnnouncementsSlugRoute
+  WebEventsSlugRoute: typeof WebEventsSlugRoute
+  WebHallPageRoute: typeof WebHallPageRoute
+  WebNewsSlugRoute: typeof WebNewsSlugRoute
+  WebAnnouncementsIndexRoute: typeof WebAnnouncementsIndexRoute
+  WebEventsIndexRoute: typeof WebEventsIndexRoute
+  WebNewsIndexRoute: typeof WebNewsIndexRoute
 }
 
 const WebRouteRouteChildren: WebRouteRouteChildren = {
   WebAlumniRoute: WebAlumniRoute,
   WebEMarketRoute: WebEMarketRoute,
+  WebFreshersRoute: WebFreshersRoute,
   WebFreshmenRoute: WebFreshmenRoute,
   WebKnhHubRoute: WebKnhHubRoute,
   WebQrcodeRoute: WebQrcodeRoute,
   WebRegisterRoute: WebRegisterRoute,
   WebYellowPagesRoute: WebYellowPagesRoute,
   WebIndexRoute: WebIndexRoute,
+  WebAnnouncementsSlugRoute: WebAnnouncementsSlugRoute,
+  WebEventsSlugRoute: WebEventsSlugRoute,
+  WebHallPageRoute: WebHallPageRoute,
+  WebNewsSlugRoute: WebNewsSlugRoute,
+  WebAnnouncementsIndexRoute: WebAnnouncementsIndexRoute,
+  WebEventsIndexRoute: WebEventsIndexRoute,
+  WebNewsIndexRoute: WebNewsIndexRoute,
 }
 
 const WebRouteRouteWithChildren = WebRouteRoute._addFileChildren(
@@ -1237,6 +1445,8 @@ const StudentStudentRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   WebRouteRoute: WebRouteRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminAdminRouteRoute: AdminAdminRouteRouteWithChildren,
   SellerSellerRouteRoute: SellerSellerRouteRouteWithChildren,
   StudentStudentRouteRoute: StudentStudentRouteRouteWithChildren,

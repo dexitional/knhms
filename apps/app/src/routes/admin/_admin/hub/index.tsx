@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { HALL_PROJECTS_CATEGORY } from '#/lib/hall'
 import { Controller, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -111,13 +112,15 @@ const TABS: Array<{
   },
 ]
 
-const ANNOUNCEMENT_CATEGORIES = ['Important', 'General', ALUMNI_HUB_CATEGORY]
+// "Hall Projects" posts also appear on the Hall Projects page (Home menu).
+const ANNOUNCEMENT_CATEGORIES = ['Important', 'General', HALL_PROJECTS_CATEGORY, ALUMNI_HUB_CATEGORY]
 const NEWS_CATEGORIES = [
   'General',
   'Hall Life',
   'Student in Focus',
   'Sports',
   'Academics',
+  HALL_PROJECTS_CATEGORY,
 ]
 
 const errorMessage = (fallback: string) => (err: unknown) =>
@@ -186,7 +189,7 @@ function HubAdminPage() {
           </p>
         </div>
         <a
-          href="/knh-hub"
+          href="/"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-primary"

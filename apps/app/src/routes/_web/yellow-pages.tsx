@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent, MouseEvent } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { pageHead } from '#/lib/seo'
 import {
   Clock,
   Globe,
@@ -21,6 +22,40 @@ import { cn } from '#/lib/utils'
 
 export const Route = createFileRoute('/_web/yellow-pages')({
   loader: () => getDirectoryEntries(),
+  // ItemList of what the page shows: people by name and role, businesses
+  // with their public details (hidden phone numbers are already removed).
+  head: ({ loaderData }) =>
+    loaderData
+      ? pageHead({
+          title: 'Yellow Pages',
+          description:
+            'The Kwame Nkrumah Hall directory: key personnel, hall executives, campus businesses and alumni, with contacts and locations.',
+          path: '/yellow-pages',
+          siteUrl: loaderData.siteUrl,
+          structured: {
+            '@type': 'ItemList',
+            name: 'Kwame Nkrumah Hall directory',
+            itemListElement: loaderData.entries
+              .filter((e) => SECTIONS.some((s) => s.category === e.category))
+              .slice(0, 200)
+              .map((e, i) => ({
+                '@type': 'ListItem',
+                position: i + 1,
+                item:
+                  e.category === 'business'
+                    ? {
+                        '@type': 'LocalBusiness',
+                        name: e.name,
+                        description: e.title,
+                        ...(e.location && { address: e.location }),
+                        ...(e.phone && { telephone: e.phone }),
+                        ...(e.website_url && { url: e.website_url }),
+                      }
+                    : { '@type': 'Person', name: e.name, jobTitle: e.title },
+              })),
+          },
+        })
+      : {},
   component: YellowPagesPage,
 })
 

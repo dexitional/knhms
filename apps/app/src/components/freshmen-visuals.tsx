@@ -8,8 +8,8 @@ import { asset } from "#/lib/asset"
 import type { TopicItem } from "#/lib/freshmen"
 import { freshmenIcon } from "#/components/freshmen-icons"
 
-// Illustrations, infographics and animated pieces for the Freshmen guide
-// (routes/_web/freshmen.tsx). Everything is drawn in code with theme colours,
+// Illustrations, infographics and animated pieces for the Freshers guide
+// (routes/_web/freshers.tsx). Everything is drawn in code with theme colours,
 // and all motion respects the viewer's reduced-motion setting (MotionConfig
 // on the page).
 
@@ -222,7 +222,7 @@ export function JourneyInfographic({ stages }: { stages: Array<JourneyStage> }) 
   return (
     <section aria-labelledby="journey-heading" className="mt-10">
       <h2 id="journey-heading" className="text-lg font-bold text-foreground">
-        Your freshman journey
+        Your fresher journey
       </h2>
       <p className="text-sm text-muted-foreground">
         {stages.length} stage{stages.length === 1 ? "" : "s"} from admission to settling in. Tap a stage to jump to it.
@@ -492,7 +492,7 @@ export function MandatoryChecklist({ items }: { items: Array<{ id: string; title
             Mandatory checklist
           </h2>
           <p className="text-sm text-muted-foreground">
-            Every freshman must complete these. Tick them off as you go; your progress is saved on this device.
+            Every fresher must complete these. Tick them off as you go; your progress is saved on this device.
           </p>
           <AnimatePresence>
             {complete && (

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { hallPageForCategory } from "#/lib/hall"
 import { Controller, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
@@ -45,13 +46,16 @@ export const Route = createFileRoute("/admin/_admin/yellow-pages/")({
   component: YellowPagesAdminPage,
 })
 
-type Category = "personnel" | "business" | "executive" | "alumni" | "page_personnel"
+type Category = "personnel" | "business" | "executive" | "alumni" | "council" | "management" | "tutor" | "page_personnel"
 
 const CATEGORY_LABELS: Record<Category, string> = {
   personnel: "Key Personnel",
   business: "Campus Business",
   executive: "KNH Executive",
   alumni: "Alumni",
+  council: "Hall Council",
+  management: "Hall Management",
+  tutor: "Hall Tutor",
   page_personnel: "Page Personnel",
 }
 
@@ -60,6 +64,9 @@ const CATEGORY_BADGE = {
   business: "info",
   executive: "purple",
   alumni: "success",
+  council: "info",
+  management: "info",
+  tutor: "info",
   page_personnel: "warning",
 } as const
 
@@ -121,7 +128,7 @@ function TagBadges({ tags }: { tags: Array<string> }) {
 const optionalUrl = z.union([z.string().url("Enter a full URL, e.g. https://…"), z.literal("")])
 
 const entrySchema = z.object({
-  category: z.enum(["personnel", "business", "executive", "alumni", "page_personnel"]),
+  category: z.enum(["personnel", "business", "executive", "alumni", "council", "management", "tutor", "page_personnel"]),
   name: z.string().trim().min(2, "Required").max(150),
   title: z.string().trim().min(1, "Required").max(150),
   subtitle: z.string().max(255),
@@ -548,6 +555,13 @@ function YellowPagesAdminPage() {
               )}
             />
 
+            {hallPageForCategory(form.watch("category")) && (
+              <p className="rounded-md bg-secondary px-3 py-2 text-sm text-muted-foreground">
+                {form.watch("category") === "executive"
+                  ? `Also listed on the ${hallPageForCategory("executive")!.label} page under Home.`
+                  : `Shown on the ${hallPageForCategory(form.watch("category"))!.label} page under Home, not on the Yellow Pages.`}
+              </p>
+            )}
             {isAdminOnly ? (
               <p className="rounded-md bg-secondary px-3 py-2 text-sm text-muted-foreground">
                 {CATEGORY_LABELS[form.watch("category")]} entries are kept in the admin only and

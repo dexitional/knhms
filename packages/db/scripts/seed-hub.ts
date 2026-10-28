@@ -171,7 +171,7 @@ const POSTS: Seed[] = [
   // Events
   {
     type: "event",
-    title: "Freshmen Orientation Week",
+    title: "Freshers Orientation Week",
     event_start: "2026-10-01",
     event_end: "2026-10-07",
     event_time: "9:00 AM - 5:00 PM",

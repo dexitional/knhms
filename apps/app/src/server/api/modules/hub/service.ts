@@ -95,6 +95,81 @@ export async function getAlumniHubPosts() {
   };
 }
 
+// The Hall Projects page: published posts of any type in the "Hall Projects"
+// category (lib/hall.ts), latest first. They still appear on Home too.
+export async function getHallProjectPosts() {
+  const [rows] = await getPool().query<(HubPostRow & RowDataPacket)[]>(
+    `SELECT * FROM hub_posts WHERE is_published = 1 AND LOWER(TRIM(category)) = 'hall projects'
+     ORDER BY sort_order, COALESCE(published_on, event_start) DESC, id DESC`,
+  );
+  return rows.map((r) => withRichBody({ ...r }));
+}
+
+// ---- Article pages (lib/posts.ts) ------------------------------------------
+
+export const ARTICLES_PER_PAGE = 12;
+
+// /news and /announcements: newest first, a page at a time. "Alumni" posts
+// stay on the Alumni page, as on Home.
+export async function listPublicPosts(type: "news" | "announcement", page: number) {
+  const pool = getPool();
+  const offset = (Math.max(1, page) - 1) * ARTICLES_PER_PAGE;
+  const [[rows], [[count]]] = await Promise.all([
+    pool.query<(HubPostRow & RowDataPacket)[]>(
+      `SELECT * FROM hub_posts WHERE type = ? AND is_published = 1 AND ${NOT_ALUMNI}
+       ORDER BY published_on DESC, sort_order, id DESC LIMIT ? OFFSET ?`,
+      [type, ARTICLES_PER_PAGE, offset],
+    ),
+    pool.query<({ total: number } & RowDataPacket)[]>(
+      `SELECT COUNT(*) AS total FROM hub_posts WHERE type = ? AND is_published = 1 AND ${NOT_ALUMNI}`,
+      [type],
+    ),
+  ]);
+  return { posts: rows.map((r) => withRichBody({ ...r })), total: Number(count?.total ?? 0), perPage: ARTICLES_PER_PAGE };
+}
+
+// /events: upcoming (or still running) soonest first, then recent past ones.
+export async function listPublicEvents() {
+  const pool = getPool();
+  const [[upcoming], [past]] = await Promise.all([
+    pool.query<(HubPostRow & RowDataPacket)[]>(
+      `SELECT * FROM hub_posts WHERE type = 'event' AND is_published = 1 AND ${NOT_ALUMNI}
+       AND COALESCE(event_end, event_start) >= CURDATE() ORDER BY event_start, sort_order, id`,
+    ),
+    pool.query<(HubPostRow & RowDataPacket)[]>(
+      `SELECT * FROM hub_posts WHERE type = 'event' AND is_published = 1 AND ${NOT_ALUMNI}
+       AND COALESCE(event_end, event_start) < CURDATE() ORDER BY event_start DESC, id DESC LIMIT 24`,
+    ),
+  ]);
+  return { upcoming: upcoming.map((r) => withRichBody({ ...r })), past: past.map((r) => withRichBody({ ...r })) };
+}
+
+// One published post of a type -- including "Alumni" ones, which the Alumni
+// page links to -- plus a few others of the same type to read next.
+export async function getPublicPost(type: "news" | "announcement" | "event", id: number) {
+  const pool = getPool();
+  const [rows] = await pool.query<(HubPostRow & RowDataPacket)[]>(
+    "SELECT * FROM hub_posts WHERE id = ? AND type = ? AND is_published = 1",
+    [id, type],
+  );
+  if (!rows[0]) return null;
+  const order = type === "event" ? "COALESCE(event_end, event_start) < CURDATE(), event_start" : "published_on DESC";
+  const [related] = await pool.query<(HubPostRow & RowDataPacket)[]>(
+    `SELECT * FROM hub_posts WHERE type = ? AND is_published = 1 AND id <> ? AND ${NOT_ALUMNI}
+     ORDER BY ${order}, id DESC LIMIT 3`,
+    [type, id],
+  );
+  return { post: withRichBody({ ...rows[0] }), related: related.map((r) => withRichBody({ ...r })) };
+}
+
+// Every readable post, for /sitemap.xml.
+export async function listSitemapPosts() {
+  const [rows] = await getPool().query<(Pick<HubPostRow, "id" | "type" | "title" | "updated_at"> & RowDataPacket)[]>(
+    "SELECT id, type, title, updated_at FROM hub_posts WHERE is_published = 1 AND type <> 'spotlight' ORDER BY id",
+  );
+  return rows.map((r) => ({ ...r }));
+}
+
 // ---- Admin -----------------------------------------------------------------
 
 export async function listPosts(type?: HubPostType) {

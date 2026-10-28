@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { optionalField as optional } from "../../lib/optional-field.js";
 
-export const directoryCategorySchema = z.enum(["personnel", "business", "executive", "page_personnel", "alumni"]);
+export const directoryCategorySchema = z.enum(["personnel", "business", "executive", "page_personnel", "alumni", "council", "management", "tutor"]);
 
 export const MAX_TAGS = 8;
 

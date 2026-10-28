@@ -1,7 +1,8 @@
-// Client-safe server function for the public Freshmen guide loader. The DB
+// Client-safe server function for the public Freshers guide loader. The DB
 // services are imported dynamically so mysql2 stays out of the browser
 // bundle (see the note in routes/api/$.ts).
 import { createServerFn } from "@tanstack/react-start";
+import { siteOrigin } from "#/lib/posts";
 
 export const getFreshmenPage = createServerFn({ method: "GET" }).handler(async () => {
   const [{ getPublicContent }, { listActiveEntries }] = await Promise.all([
@@ -9,7 +10,7 @@ export const getFreshmenPage = createServerFn({ method: "GET" }).handler(async (
     import("./api/modules/directory/service.js"),
   ]);
   const [content, entries] = await Promise.all([getPublicContent(), listActiveEntries()]);
-  // The people freshmen will meet: the first six Key Personnel and the first
+  // The people freshers will meet: the first six Key Personnel and the first
   // three KNH Executives, in their Yellow Pages order (entries arrive sorted
   // by category, then display order).
   const pick = (category: string, count: number) => entries.filter((e) => e.category === category).slice(0, count);
@@ -19,5 +20,5 @@ export const getFreshmenPage = createServerFn({ method: "GET" }).handler(async (
     title,
     photo_url,
   }));
-  return { ...content, people };
+  return { ...content, people, siteUrl: siteOrigin(process.env.APP_URL) };
 });
