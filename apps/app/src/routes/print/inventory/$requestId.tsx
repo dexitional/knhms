@@ -6,13 +6,15 @@ import { asset } from "#/lib/asset"
 import { STATUS_LABELS, formatDateTime } from "#/lib/inventory"
 import type { InventoryRequest } from "#/lib/inventory"
 import { getAdminSession } from "#/server/session"
+import { cachedSession, sessionKeys } from "#/lib/session-cache"
+import { PrintSkeleton } from "#/components/skeletons"
 
 // Printable stores requisition form for one inventory request. Signature
 // lines are left blank for handwritten sign-off; recorded approvals and
 // releases are printed with their names and times.
 export const Route = createFileRoute("/print/inventory/$requestId")({
-  beforeLoad: async () => {
-    const admin = await getAdminSession()
+  beforeLoad: async ({ context }) => {
+    const admin = await cachedSession(context.queryClient, sessionKeys.admin, () => getAdminSession())
     if (!admin) throw new Error("Not authenticated")
   },
   component: InventoryPrintPage,
@@ -25,7 +27,7 @@ function InventoryPrintPage() {
     queryFn: () => api.get<{ request: InventoryRequest }>(`/inventory/requests/${requestId}`),
   })
   if (error) return <p className="py-20 text-center text-gray-600">This request couldn't be loaded.</p>
-  if (isLoading || !data) return <p className="py-20 text-center text-gray-600">Loading...</p>
+  if (isLoading || !data) return <PrintSkeleton />
   return <PrintForm r={data.request} />
 }
 

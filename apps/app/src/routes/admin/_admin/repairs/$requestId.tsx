@@ -18,6 +18,7 @@ import {
 import { StatusBadge } from "#/components/status-badge";
 import { RoomNumberBadge } from "#/components/room-number-badge";
 import { canManage } from "#/lib/permissions";
+import { DetailSkeleton } from "#/components/skeletons";
 
 export const Route = createFileRoute("/admin/_admin/repairs/$requestId")({
   component: RepairDetailPage,
@@ -89,7 +90,7 @@ function RepairDetailPage() {
     onError: () => toast.error("Couldn't update the request."),
   });
 
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading || !data) return <DetailSkeleton />;
   const r = data.request;
 
   return (

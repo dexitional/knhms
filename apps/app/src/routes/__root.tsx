@@ -8,6 +8,7 @@ import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
 
 import appCss from "../styles.css?url";
 import { asset } from "#/lib/asset";
+import { NavigationProgress } from "#/components/skeletons";
 
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -66,6 +67,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <NavigationProgress />
         {children}
         <Toaster richColors position="top-right" />
         <TanStackDevtools

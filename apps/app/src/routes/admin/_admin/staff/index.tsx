@@ -35,6 +35,7 @@ import {
   SelectValue,
 } from "#/components/ui/select.tsx"
 import { RoleBadge } from "#/components/role-badge"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/staff/")({
   component: StaffPage,
@@ -145,7 +146,6 @@ function StaffPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[820px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -160,6 +160,7 @@ function StaffPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={8} />}
             {data?.admins
               .filter((a) =>
                 a.full_name.toLowerCase().includes(search.toLowerCase()) ||

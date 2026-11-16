@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "#/components/ui/select.tsx";
+import { DetailSkeleton } from "#/components/skeletons";
 
 export const Route = createFileRoute("/admin/_admin/staff/$staffId")({
   component: StaffDetailPage,
@@ -84,7 +85,7 @@ function StaffDetailPage() {
   if (currentAdmin.role !== "super_admin") {
     return <p className="text-muted-foreground">Only super admins can manage user accounts.</p>;
   }
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading || !data) return <DetailSkeleton />;
 
   return (
     <div className="mx-auto flex max-w-xl flex-col gap-6">

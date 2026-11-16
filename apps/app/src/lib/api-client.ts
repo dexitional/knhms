@@ -1,4 +1,28 @@
+import { clearSessionCache, markSessionStale } from "./session-cache";
+
 const API_URL = "/api";
+
+const SIGN_IN_PAGES = [
+  ["/admin", "/admin/login"],
+  ["/student", "/student/login"],
+  ["/seller", "/seller/login"],
+] as const;
+
+// A 401 means the session ran out while the page was open. Send the user to
+// their portal's sign-in page instead of leaving the page half-broken. Calls
+// to the auth endpoints themselves (a wrong password) are left to the form.
+function redirectToSignIn(path: string) {
+  if (typeof window === "undefined" || /^\/[a-z]+-auth\//.test(path)) return;
+  const here = window.location.pathname;
+  const match = SIGN_IN_PAGES.find(([base, login]) => (here === base || here.startsWith(`${base}/`)) && here !== login);
+  if (match) window.location.assign(match[1]);
+}
+
+function afterChange(path: string, method: string) {
+  if (method === "GET") return;
+  if (/^\/[a-z]+-auth\/(login|logout|register)/.test(path)) clearSessionCache();
+  else markSessionStale();
+}
 
 export class ApiError extends Error {
   constructor(
@@ -29,10 +53,12 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   });
 
   if (!res.ok) {
+    if (res.status === 401) redirectToSignIn(path);
     const body = await res.json().catch(() => ({ error: res.statusText }));
     throw new ApiError(body.error ?? "Request failed", res.status);
   }
 
+  afterChange(path, init?.method ?? "GET");
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
 }

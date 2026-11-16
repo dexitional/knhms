@@ -3,11 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { api } from "#/lib/api-client";
 import { getAdminSession } from "#/server/session";
+import { cachedSession, sessionKeys } from "#/lib/session-cache";
+import { PrintSkeleton } from "#/components/skeletons";
 import { RoomNumberBadge } from "#/components/room-number-badge";
 
 export const Route = createFileRoute("/print/repairs/$requestId")({
-  beforeLoad: async () => {
-    const admin = await getAdminSession();
+  beforeLoad: async ({ context }) => {
+    const admin = await cachedSession(context.queryClient, sessionKeys.admin, () => getAdminSession());
     if (!admin) throw new Error("Not authenticated");
   },
   component: RepairPrintPage,
@@ -36,7 +38,7 @@ function RepairPrintPage() {
     queryFn: () => api.get<{ request: RepairDetail }>(`/repairs/${requestId}`),
   });
 
-  if (isLoading || !data) return <p className="text-center text-gray-600 py-20">Loading...</p>;
+  if (isLoading || !data) return <PrintSkeleton />;
   const r = data.request;
 
   return (

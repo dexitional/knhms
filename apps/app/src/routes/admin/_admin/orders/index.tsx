@@ -22,6 +22,7 @@ import {
 } from "#/components/ui/select.tsx"
 import { Pagination } from "#/components/pagination"
 import { canManage } from "#/lib/permissions"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/orders/")({
   component: AdminOrdersPage,
@@ -110,7 +111,6 @@ function AdminOrdersPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -122,6 +122,7 @@ function AdminOrdersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={5} />}
             {data?.items.map((order) => (
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.student_name}</TableCell>

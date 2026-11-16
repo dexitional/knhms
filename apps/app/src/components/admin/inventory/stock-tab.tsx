@@ -18,6 +18,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
 import { Table, TableBody, TableCell, TableEmptyValue, TableHead, TableHeader, TableRow } from "#/components/ui/table.tsx"
 import { ImportDialog } from "./import-dialog"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 const errorMessage = (fallback: string) => (err: unknown) =>
   toast.error(err instanceof ApiError ? err.message : fallback)
@@ -161,13 +162,7 @@ export function StockTab({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading && (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">
-                  Loading...
-                </TableCell>
-              </TableRow>
-            )}
+            {isLoading && <TableBodySkeleton cols={7} />}
             {!isLoading && visible.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={7} className="py-8 text-center text-muted-foreground">

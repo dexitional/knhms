@@ -12,6 +12,7 @@ import { FormField } from "#/components/form-field"
 import { Button } from "#/components/ui/button.tsx"
 import { Input } from "#/components/ui/input.tsx"
 import { Textarea } from "#/components/ui/textarea.tsx"
+import { FormSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/account")({
   component: SellerAccountPage,
@@ -26,7 +27,7 @@ function SellerAccountPage() {
   return (
     <div className="flex max-w-2xl flex-col gap-6">
       <h1 className="text-2xl font-bold text-foreground">Account</h1>
-      {data ? <ProfileForm seller={data.seller} /> : <p className="text-muted-foreground">Loading...</p>}
+      {data ? <ProfileForm seller={data.seller} /> : <FormSkeleton fields={6} />}
       <PasswordForm />
     </div>
   )

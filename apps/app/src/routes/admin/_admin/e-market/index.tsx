@@ -44,6 +44,7 @@ import { ClicksCell, MarketActivity, ViewsCell, clicksOf, statsFor } from "#/com
 import type { StatsRange } from "#/components/admin/market-analytics"
 import type { MarketAnalytics } from "#/lib/market"
 import { Pagination } from "#/components/pagination"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/e-market/")({
   component: EMarketAdminPage,
@@ -382,7 +383,6 @@ function ProductsTab({
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[1120px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -398,6 +398,7 @@ function ProductsTab({
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={9} />}
             {!isLoading && products.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={9} className="py-8 text-center text-muted-foreground">
@@ -726,7 +727,6 @@ function CategoriesTab({
       )}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -739,6 +739,7 @@ function CategoriesTab({
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={6} />}
             {!isLoading && categories.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">

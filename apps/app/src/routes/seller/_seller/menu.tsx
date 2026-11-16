@@ -12,6 +12,7 @@ import type { MenuItem } from "#/components/menu-manager"
 import { Button } from "#/components/ui/button.tsx"
 import { Input } from "#/components/ui/input.tsx"
 import { Textarea } from "#/components/ui/textarea.tsx"
+import { StackSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/menu")({
   // Only for food vendors.
@@ -43,7 +44,7 @@ function SellerMenuPage() {
     queryFn: () => api.get<{ vendor: Vendor }>("/seller/vendor"),
   })
 
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>
+  if (isLoading || !data) return <StackSkeleton />
 
   return (
     <div className="flex max-w-3xl flex-col gap-6">

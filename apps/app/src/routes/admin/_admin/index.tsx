@@ -19,6 +19,7 @@ import { api } from "#/lib/api-client"
 import type { AdminOverview } from "#/lib/overview"
 import { ChartCard, ChartEmpty, HealthBar, Kpi, PeriodTabs, TREND_TITLE } from "#/components/admin/report-ui"
 import type { ReportPeriod } from "#/components/admin/report-ui"
+import { DashboardSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/")({
   component: AdminOverviewPage,
@@ -75,7 +76,7 @@ function AdminOverviewPage() {
       </div>
 
       {isLoading || !data ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <DashboardSkeleton stats={6} />
       ) : (
         <>
           <p className="-mt-2 text-sm text-muted-foreground">

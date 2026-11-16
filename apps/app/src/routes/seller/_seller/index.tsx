@@ -12,6 +12,7 @@ import {
 import { BillingSummaryCard } from "#/components/seller-billing"
 import { Badge } from "#/components/ui/badge.tsx"
 import { Button } from "#/components/ui/button.tsx"
+import { DashboardSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/")({
   component: SellerDashboard,
@@ -23,7 +24,7 @@ function SellerDashboard() {
   const analytics = useQuery(sellerAnalyticsQuery(7))
   const isBusiness = session.sellerType === "business"
 
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>
+  if (isLoading || !data) return <DashboardSkeleton />
   const { seller, billing, listingCount } = data
 
   return (

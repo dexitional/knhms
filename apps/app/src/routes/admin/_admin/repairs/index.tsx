@@ -27,6 +27,7 @@ import { Pagination } from "#/components/pagination"
 import { RoomNumberBadge } from "#/components/room-number-badge"
 import { Pencil } from "lucide-react"
 import { canManage } from "#/lib/permissions"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/repairs/")({
   component: AdminRepairsPage,
@@ -116,7 +117,6 @@ function AdminRepairsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -135,6 +135,7 @@ function AdminRepairsPage() {
             </TableRow>
           </TableHeader>
 <TableBody>
+            {isLoading && <TableBodySkeleton cols={8} />}
             {data?.items.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>

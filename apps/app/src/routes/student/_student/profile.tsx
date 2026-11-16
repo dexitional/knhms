@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.t
 import { Input } from "#/components/ui/input.tsx";
 import { Label } from "#/components/ui/label.tsx";
 import { Button } from "#/components/ui/button.tsx";
+import { DetailSkeleton } from "#/components/skeletons";
 
 export const Route = createFileRoute("/student/_student/profile")({
   component: StudentProfilePage,
@@ -95,7 +96,7 @@ function StudentProfilePage() {
     },
   });
 
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>;
+  if (isLoading || !data) return <DetailSkeleton />;
   const student = data.student;
 
   return (

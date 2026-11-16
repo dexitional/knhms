@@ -18,6 +18,8 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { getAdminSession } from "#/server/session";
+import { cachedSession, sessionKeys } from "#/lib/session-cache";
+import { usePreloadRoutes } from "#/lib/use-preload-routes";
 import { api } from "#/lib/api-client";
 import { asset } from "#/lib/asset";
 import { Button } from "#/components/ui/button.tsx";
@@ -36,8 +38,8 @@ function moduleForPath(pathname: string): AdminModule | null {
 }
 
 export const Route = createFileRoute("/admin/_admin")({
-  beforeLoad: async ({ location }) => {
-    const admin = await getAdminSession();
+  beforeLoad: async ({ context, location }) => {
+    const admin = await cachedSession(context.queryClient, sessionKeys.admin, () => getAdminSession());
     if (!admin) throw redirect({ to: "/admin/login" });
     // Pages outside the role's permissions send them to their own home page.
     const area = moduleForPath(location.pathname);
@@ -73,6 +75,7 @@ function AdminLayout() {
   // Only the modules this role can open (lib/permissions.ts).
   const visibleNav = navItems.filter((item) => canView(admin.role, item.module));
   const navigate = useNavigate();
+  usePreloadRoutes(visibleNav.map((item) => item.to));
 
   const handleLogout = async () => {
     await api.post("/admin-auth/logout");

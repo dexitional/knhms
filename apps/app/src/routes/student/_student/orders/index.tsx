@@ -4,6 +4,7 @@ import { api } from "#/lib/api-client";
 import { Card, CardContent } from "#/components/ui/card.tsx";
 import { Button } from "#/components/ui/button.tsx";
 import { StatusBadge } from "#/components/status-badge";
+import { ListSkeleton } from "#/components/skeletons";
 
 export const Route = createFileRoute("/student/_student/orders/")({
   component: MyOrdersPage,
@@ -34,7 +35,7 @@ function MyOrdersPage() {
         </Button>
       </div>
 
-      {isLoading && <p className="text-muted-foreground">Loading...</p>}
+      {isLoading && <ListSkeleton />}
       {data?.orders.length === 0 && <p className="text-muted-foreground">You haven't placed any orders yet.</p>}
 
       <div className="flex flex-col gap-3">

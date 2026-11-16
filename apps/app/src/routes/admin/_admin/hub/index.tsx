@@ -51,6 +51,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '#/components/ui/select.tsx'
+import { TableBodySkeleton } from '#/components/skeletons'
 
 const PAGE_SIZE = 15
 
@@ -251,9 +252,6 @@ function HubAdminPage() {
       <p className="-mt-3 text-sm text-muted-foreground">{current.hint}</p>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && (
-          <p className="px-6 py-4 text-muted-foreground">Loading...</p>
-        )}
         <Table className="min-w-[860px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -268,6 +266,7 @@ function HubAdminPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={6} />}
             {!isLoading && visible.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell

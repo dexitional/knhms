@@ -40,6 +40,7 @@ import { RoomNumberBadge } from "#/components/room-number-badge"
 import { BlockBadge } from "#/components/block-badge"
 import { GenderBadge } from "#/components/gender-badge"
 import { canManage } from "#/lib/permissions"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/rooms/")({
   component: RoomsPage,
@@ -285,7 +286,6 @@ function RoomsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[720px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -298,6 +298,7 @@ function RoomsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={6} />}
             {data?.items.map((room) => (
               <TableRow key={room.id}>
                 <TableCell>

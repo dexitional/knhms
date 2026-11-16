@@ -39,6 +39,7 @@ import {
 } from "#/components/ui/select.tsx"
 import { canManage } from "#/lib/permissions"
 import { Pagination } from "#/components/pagination"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 const PAGE_SIZE = 15
 
@@ -323,7 +324,6 @@ function YellowPagesAdminPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -338,6 +338,7 @@ function YellowPagesAdminPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={8} />}
             {!isLoading && entries.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">

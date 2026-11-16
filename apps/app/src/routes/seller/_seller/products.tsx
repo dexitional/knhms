@@ -18,6 +18,7 @@ import { Textarea } from "#/components/ui/textarea.tsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#/components/ui/table.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/products")({
   // Only for businesses.
@@ -173,7 +174,6 @@ function SellerProductsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[760px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -186,6 +186,7 @@ function SellerProductsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={6} />}
             {!isLoading && products.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="py-10 text-center text-muted-foreground">

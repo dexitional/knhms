@@ -20,6 +20,7 @@ import { Textarea } from "#/components/ui/textarea.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
 import { canManage } from "#/lib/permissions"
+import { DetailSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/sellers/$sellerId")({
   component: SellerDetailPage,
@@ -62,7 +63,7 @@ function SellerDetailPage() {
     onError: errorMessage("Couldn't reset the password."),
   })
 
-  if (isLoading) return <p className="text-muted-foreground">Loading...</p>
+  if (isLoading) return <DetailSkeleton />
   if (error || !data) return <p className="text-destructive">{error instanceof Error ? error.message : "Not found."}</p>
 
   const { seller, billing, payments, listingCount } = data

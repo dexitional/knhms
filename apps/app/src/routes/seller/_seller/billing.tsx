@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { useQuery } from "@tanstack/react-query"
 import { sellerOverviewQuery } from "#/lib/sellers"
 import { BillingSummaryCard, PaymentHistoryTable } from "#/components/seller-billing"
+import { StackSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/billing")({
   component: SellerBillingPage,
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/seller/_seller/billing")({
 
 function SellerBillingPage() {
   const { data, isLoading } = useQuery(sellerOverviewQuery)
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>
+  if (isLoading || !data) return <StackSkeleton />
 
   return (
     <div className="flex flex-col gap-6">

@@ -10,6 +10,7 @@ import { Button } from "#/components/ui/button.tsx"
 import { StatusBadge } from "#/components/status-badge"
 import { Pagination } from "#/components/pagination"
 import { canManage } from "#/lib/permissions"
+import { ListSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/suggestions/")({
   component: AdminSuggestionsPage,
@@ -70,7 +71,7 @@ function AdminSuggestionsPage() {
         </div>
       </div>
 
-      {isLoading && <p className="text-muted-foreground">Loading...</p>}
+      {isLoading && <ListSkeleton />}
 
       <div className="flex flex-col gap-3">
         {data?.items.map((s) => (

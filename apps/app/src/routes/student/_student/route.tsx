@@ -1,13 +1,15 @@
 import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, LogOut, MessageSquareHeart, ShoppingBag, User, Wrench } from "lucide-react";
 import { getStudentSession } from "#/server/session";
+import { cachedSession, sessionKeys } from "#/lib/session-cache";
+import { usePreloadRoutes } from "#/lib/use-preload-routes";
 import { api } from "#/lib/api-client";
 import { asset } from "#/lib/asset";
 import { Button } from "#/components/ui/button.tsx";
 
 export const Route = createFileRoute("/student/_student")({
-  beforeLoad: async () => {
-    const student = await getStudentSession();
+  beforeLoad: async ({ context }) => {
+    const student = await cachedSession(context.queryClient, sessionKeys.student, () => getStudentSession());
     if (!student) throw redirect({ to: "/student/login" });
     return { student };
   },
@@ -25,6 +27,7 @@ const navItems = [
 function StudentLayout() {
   const { student } = Route.useRouteContext();
   const navigate = useNavigate();
+  usePreloadRoutes(navItems.map((item) => item.to));
 
   const handleLogout = async () => {
     await api.post("/student-auth/logout");

@@ -2,6 +2,8 @@ import { createFileRoute, Link, Outlet, redirect, useNavigate } from "@tanstack/
 import { useQuery } from "@tanstack/react-query"
 import { BarChart3, CircleAlert, Clock, CreditCard, LayoutDashboard, LogOut, Package, UserCog, UtensilsCrossed } from "lucide-react"
 import { getSellerSession } from "#/server/session"
+import { cachedSession, sessionKeys } from "#/lib/session-cache"
+import { usePreloadRoutes } from "#/lib/use-preload-routes"
 import { api } from "#/lib/api-client"
 import { asset } from "#/lib/asset"
 import { SELLER_TYPE_LABELS, sellerOverviewQuery } from "#/lib/sellers"
@@ -10,8 +12,8 @@ import { Button } from "#/components/ui/button.tsx"
 import { SellerLogo } from "#/components/seller-logo"
 
 export const Route = createFileRoute("/seller/_seller")({
-  beforeLoad: async () => {
-    const seller = await getSellerSession()
+  beforeLoad: async ({ context }) => {
+    const seller = await cachedSession(context.queryClient, sessionKeys.seller, () => getSellerSession())
     if (!seller) throw redirect({ to: "/seller/login" })
     return { seller }
   },
@@ -34,6 +36,7 @@ function SellerLayout() {
     { to: "/seller/billing", label: "Billing", icon: CreditCard, exact: false },
     { to: "/seller/account", label: "Account", icon: UserCog, exact: false },
   ] as const
+  usePreloadRoutes(navItems.map((item) => item.to))
 
   const handleLogout = async () => {
     await api.post("/seller-auth/logout")

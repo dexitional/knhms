@@ -32,6 +32,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "#/components/ui/dialog.tsx"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 interface Vendor {
   id: number
@@ -99,7 +100,6 @@ export function FoodVendorsTab({ canEdit, analytics }: { canEdit: boolean; analy
       )}
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[1040px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -114,6 +114,7 @@ export function FoodVendorsTab({ canEdit, analytics }: { canEdit: boolean; analy
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={8} />}
             {!isLoading && vendors.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={8} className="py-8 text-center text-muted-foreground">

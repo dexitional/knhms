@@ -27,6 +27,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { SellerLogo } from "#/components/seller-logo"
 import { canManage } from "#/lib/permissions"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/sellers/")({
   component: SellersPage,
@@ -107,7 +108,6 @@ function SellersPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[900px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -120,6 +120,7 @@ function SellersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={6} />}
             {!isLoading && visible.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">

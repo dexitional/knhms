@@ -20,6 +20,7 @@ import type { InventoryCategory, InventoryReport, ReportPeriod } from "#/lib/inv
 import { Button } from "#/components/ui/button.tsx"
 import { ChartCard, ChartEmpty, HealthBar, Kpi, PeriodTabs, TREND_TITLE } from "#/components/admin/report-ui"
 import { CategorySelect } from "./stock-tab"
+import { DashboardSkeleton } from "#/components/skeletons"
 
 // Fixed chart colours: amber = requested/pending, blue = approved,
 // green = released, rose = rejected, slate = cancelled.
@@ -58,7 +59,7 @@ export function ReportsTab({ categories }: { categories: Array<InventoryCategory
       </div>
 
       {isLoading || !data ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <DashboardSkeleton />
       ) : (
         <>
           <p className="-mt-2 text-sm text-muted-foreground">

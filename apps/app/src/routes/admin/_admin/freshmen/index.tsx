@@ -21,6 +21,7 @@ import { Textarea } from "#/components/ui/textarea.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
 import { canManage } from "#/lib/permissions"
+import { ListSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/freshmen/")({
   component: FreshmenAdminPage,
@@ -139,7 +140,7 @@ function FreshmenAdminPage() {
           ))}
       </div>
 
-      {isLoading && <p className="text-muted-foreground">Loading...</p>}
+      {isLoading && <ListSkeleton />}
 
       {tab === "guides" && !isLoading && (
         <div className="flex flex-col gap-4">

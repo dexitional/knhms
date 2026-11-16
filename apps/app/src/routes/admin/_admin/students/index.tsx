@@ -19,6 +19,7 @@ import { Pagination } from "#/components/pagination"
 import { ImageViewer } from "#/components/image-viewer"
 import { GenderBadge } from "#/components/gender-badge"
 import { RoomNumberBadge } from "#/components/room-number-badge"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/students/")({
   component: StudentsPage,
@@ -76,7 +77,6 @@ function StudentsPage() {
       </div>
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
-        {isLoading && <p className="px-6 py-4 text-muted-foreground">Loading...</p>}
         <Table className="min-w-[760px]">
           <TableHeader>
             <TableRow className="hover:bg-transparent">
@@ -92,6 +92,7 @@ function StudentsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
+            {isLoading && <TableBodySkeleton cols={9} />}
             {data?.items.map((student) => (
               <TableRow key={student.id}>
                 <TableCell className="pr-0">

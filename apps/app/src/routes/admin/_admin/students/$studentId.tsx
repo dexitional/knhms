@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card.t
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Input } from "#/components/ui/input.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
+import { DetailSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/admin/_admin/students/$studentId")({
   component: StudentDetailPage,
@@ -71,7 +72,7 @@ function StudentDetailPage() {
     onError: errorMessage("Couldn't reset the PIN."),
   })
 
-  if (isLoading || !data) return <p className="text-muted-foreground">Loading...</p>
+  if (isLoading || !data) return <DetailSkeleton />
   const s = data.student
   const locked = !!s.locked_until && new Date(s.locked_until) > new Date()
 

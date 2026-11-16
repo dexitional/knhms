@@ -14,6 +14,7 @@ import { Textarea } from "#/components/ui/textarea.tsx"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "#/components/ui/dialog.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "#/components/ui/table.tsx"
+import { TableBodySkeleton } from "#/components/skeletons"
 
 // A small config-driven list + form for the Alumni admin collections
 // (projects, executives, gallery, donation channels, donations). Each field
@@ -270,10 +271,11 @@ export function ResourceTab<T extends { id: number }>({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLoading || items.length === 0) && (
+            {isLoading && <TableBodySkeleton cols={columns.length + 1} />}
+            {!isLoading && items.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={columns.length + 1} className="py-8 text-center text-muted-foreground">
-                  {isLoading ? "Loading..." : q ? "Nothing matches your search." : emptyText}
+                  {q ? "Nothing matches your search." : emptyText}
                 </TableCell>
               </TableRow>
             )}

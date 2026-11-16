@@ -34,6 +34,7 @@ import { Button } from "#/components/ui/button.tsx"
 import { Textarea } from "#/components/ui/textarea.tsx"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "#/components/ui/select.tsx"
 import { Table, TableBody, TableCell, TableEmptyValue, TableHead, TableHeader, TableRow } from "#/components/ui/table.tsx"
+import { TableBodySkeleton, TableRowsSkeleton } from "#/components/skeletons"
 
 const TABS = ["memberships", "donations", "projects", "executives", "gallery", "channels"] as const
 type Tab = (typeof TABS)[number]
@@ -487,10 +488,11 @@ function DonationsTab({ canEdit }: { canEdit: boolean }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {(isLoading || items.length === 0) && (
+            {isLoading && <TableBodySkeleton cols={6} />}
+            {!isLoading && items.length === 0 && (
               <TableRow className="hover:bg-transparent">
                 <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                  {isLoading ? "Loading..." : "No donations here."}
+                  No donations here.
                 </TableCell>
               </TableRow>
             )}
@@ -659,8 +661,9 @@ function MembershipsTab({ canEdit }: { canEdit: boolean }) {
         occupation as tags) with their phone number hidden. Show it from here when they agree.
       </p>
       <div className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
-        {(isLoading || items.length === 0) && (
-          <p className="py-8 text-center text-sm text-muted-foreground">{isLoading ? "Loading..." : "No applications here."}</p>
+        {isLoading && <TableRowsSkeleton rows={5} cols={3} />}
+        {!isLoading && items.length === 0 && (
+          <p className="py-8 text-center text-sm text-muted-foreground">No applications here.</p>
         )}
         {pageItems.map((m) => {
           const open = openId === m.id

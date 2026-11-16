@@ -18,6 +18,7 @@ import { ArrowDownRight, ArrowUpRight, Eye, ImageIcon, MessageCircle, MousePoint
 import { cn } from "#/lib/utils"
 import { sellerAnalyticsQuery } from "#/lib/sellers"
 import type { AnalyticsRange, AnalyticsTotals } from "#/lib/sellers"
+import { DashboardSkeleton } from "#/components/skeletons"
 
 export const Route = createFileRoute("/seller/_seller/analytics")({
   component: SellerAnalyticsPage,
@@ -116,7 +117,7 @@ function SellerAnalyticsPage() {
       </div>
 
       {isLoading || !data ? (
-        <p className="text-muted-foreground">Loading...</p>
+        <DashboardSkeleton stats={5} />
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
